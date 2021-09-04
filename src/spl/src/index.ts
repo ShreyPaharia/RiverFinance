@@ -89,7 +89,16 @@ export const TokenSwapLayout = BufferLayout.struct([
   // BufferLayout.blob(32, 'curveParameters'),
 ]);
 
-export const TokenStreamAggrementLayout = BufferLayout.struct([
+export const TokenStreamLayout = BufferLayout.struct([
+  // BufferLayout.u8('version'),
+  // BufferLayout.u8('isInitialized'),
+  // BufferLayout.u8('nonce'),
+  // Layout.publicKey('tokenProgramId'),
+  // Layout.publicKey('token'),
+  // Layout.publicKey('streamTokenMint'),
+  // Layout.publicKey('mintToken'),
+  // Layout.publicKey('feeAccount'),
+
   BufferLayout.u8('version'),
   BufferLayout.u8('isInitialized'),
   BufferLayout.u8('nonce'),
@@ -100,19 +109,10 @@ export const TokenStreamAggrementLayout = BufferLayout.struct([
   Layout.publicKey('mintA'),
   Layout.publicKey('mintB'),
   Layout.publicKey('feeAccount'),
-  // Layout.uint64('tradeFeeNumerator'),
-  // Layout.uint64('tradeFeeDenominator'),
-  // Layout.uint64('ownerTradeFeeNumerator'),
-  // Layout.uint64('ownerTradeFeeDenominator'),
-  // Layout.uint64('ownerWithdrawFeeNumerator'),
-  // Layout.uint64('ownerWithdrawFeeDenominator'),
-  // Layout.uint64('hostFeeNumerator'),
-  // Layout.uint64('hostFeeDenominator'),
-  // BufferLayout.u8('curveType'),
-  // BufferLayout.blob(32, 'curveParameters'),
+
 ]);
 
-export const TokenStreamAggrementLayout2 = BufferLayout.struct([
+export const TokenStreamAggrementLayout = BufferLayout.struct([
   // BufferLayout.u8('version'),
   BufferLayout.u8('isInitialized'),
   BufferLayout.u8('agreementLength'),
@@ -172,6 +172,7 @@ export class TokenSwap {
    */
   constructor(
     private connection: Connection,
+    public tokenSwapAccount: Account,
     public tokenSwap: PublicKey,
     public swapProgramId: PublicKey,
     public tokenProgramId: PublicKey,
@@ -194,6 +195,7 @@ export class TokenSwap {
     public payer: Account,
   ) {
     this.connection = connection;
+    this.tokenSwapAccount = tokenSwapAccount;
     this.tokenSwap = tokenSwap;
     this.swapProgramId = swapProgramId;
     this.tokenProgramId = tokenProgramId;
@@ -271,16 +273,6 @@ export class TokenSwap {
     const commandDataLayout = BufferLayout.struct([
       BufferLayout.u8('instruction'),
       BufferLayout.u8('nonce'),
-      // BufferLayout.nu64('tradeFeeNumerator'),
-      // BufferLayout.nu64('tradeFeeDenominator'),
-      // BufferLayout.nu64('ownerTradeFeeNumerator'),
-      // BufferLayout.nu64('ownerTradeFeeDenominator'),
-      // BufferLayout.nu64('ownerWithdrawFeeNumerator'),
-      // BufferLayout.nu64('ownerWithdrawFeeDenominator'),
-      // BufferLayout.nu64('hostFeeNumerator'),
-      // BufferLayout.nu64('hostFeeDenominator'),
-      // BufferLayout.u8('curveType'),
-      // BufferLayout.blob(32, 'curveParameters'),
     ]);
     let data = Buffer.alloc(16);
     // let data = Buffer.alloc(1024);
@@ -296,16 +288,6 @@ export class TokenSwap {
         {
           instruction: 0, // InitializeSwap instruction
           nonce,
-          // tradeFeeNumerator,
-          // tradeFeeDenominator,
-          // ownerTradeFeeNumerator,
-          // ownerTradeFeeDenominator,
-          // ownerWithdrawFeeNumerator,
-          // ownerWithdrawFeeDenominator,
-          // hostFeeNumerator,
-          // hostFeeDenominator,
-          // curveType,
-          // curveParameters: curveParamsBuffer,
         },
         data,
       );
@@ -320,6 +302,7 @@ export class TokenSwap {
 
   static async loadTokenSwap(
     connection: Connection,
+    tokenSwapAccount:Account,
     address: PublicKey,
     programId: PublicKey,
     payer: Account,
@@ -378,6 +361,7 @@ export class TokenSwap {
 
     return new TokenSwap(
       connection,
+      tokenSwapAccount,
       address,
       programId,
       tokenProgramId,
@@ -448,6 +432,7 @@ export class TokenSwap {
     let transaction;
     const tokenSwap = new TokenSwap(
       connection,
+      tokenSwapAccount,
       tokenSwapAccount.publicKey,
       swapProgramId,
       tokenProgramId,
@@ -1049,116 +1034,75 @@ export class TokenSwap {
    * @param minimumTokenB The minimum amount of token B to withdraw
    */
   async startStreamTypes(
-    // userAgggrementA: PublicKey,
-    // userAgggrementB: PublicKey,
     userTransferAuthority: Account,
     flowRate: number | Numberu64,
     swapProgramId: PublicKey,
     payer: Signer,
-    streamOwner: Account,
   ): Promise<TransactionSignature> {
     let transaction;
-    const userAgggrementA = Keypair.generate();
-    const userAgggrementB = Keypair.generate();
-    // const userAgggrementA = new Account();
+    const userAgggrementA = new Account();
+    const userAgggrementB = new Account();
 
-
-    // const streamOwner = await newAccountWithLamports(connection, 2000000000);
-    // const payer = await newAccountWithLamports(connection, 2000000000 /* wag */);
-
-    console.log(" created usingg createWrappedNativeAccount");
-    
-    // Allocate memory for the account
     const balanceNeeded = await TokenSwap.getMinBalanceRentForExemptTokenStreamAggrement(
       this.connection,
     );
 
-    console.log('creating token C');
-    const mintC = await Token.createMint(
-      this.connection,
-      payer,
-      streamOwner.publicKey,
-      null,
-      2,
-      swapProgramId,
-    );
-    console.log("payer ", payer.publicKey);
-    console.log("userAgggrementA ", userAgggrementA.publicKey);
-    console.log("streamOwner ", streamOwner.publicKey);
-
     transaction = new Transaction();
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: payer.publicKey,
-        newAccountPubkey: userAgggrementA.publicKey,
-        lamports: balanceNeeded,
-        space: TokenStreamAggrementLayout.span,
-        programId: swapProgramId,
-      }));
 
-      // transaction.add(
-      //   Token.createInitAccountInstruction(
-      //     mintC.programId,
-      //     mintC.publicKey,
-      //     userAgggrementA.publicKey,
-      //     streamOwner.publicKey,
-      //   ),
-      // );
-    
-      // const mintPublicKey = this.publicKey;
-      // transaction.add( 
-      //   Token.createInitAccountInstruction(
-      //     swapProgramId,
-      //     mintB.publicKey,
-      //     userAgggrementA.publicKey,
-      //     streamOwner.publicKey,
-      //   ),
-      // );
     // transaction.add(
+    //   SystemProgram.createAccount({
+    //     fromPubkey: payer.publicKey,
+    //     newAccountPubkey: userAgggrementA.publicKey,
+    //     lamports: balanceNeeded,
+    //     space: TokenStreamAggrementLayout.span,
+    //     programId: swapProgramId,
+    //   }));
+
+    //   transaction.add(
     //     SystemProgram.createAccount({
     //       fromPubkey: payer.publicKey,
     //       newAccountPubkey: userAgggrementB.publicKey,
     //       lamports: balanceNeeded,
-    //       space: StreamAggrementLayout.span,
+    //       space: TokenStreamAggrementLayout.span,
     //       programId: swapProgramId,
     //     }));
-    //   // const mintPublicKey = this.publicKey;
-    //   transaction.add(
-    //     Token.createInitAccountInstruction(
-    //       swapProgramId,
-    //       mintB.publicKey,
-    //       userAgggrementB.publicKey,
-    //       streamOwner.publicKey,
-    //     ),
-    //   );
 
     // transaction.add(
-    //   TokenSwap.startStreamTypesInstruction(
-    //     this.tokenSwap,
-    //     this.authority,
-    //     userTransferAuthority.publicKey,
-    //     // this.poolToken,
-    //     // this.feeAccount,
-    //     // poolAccount,
-    //     this.tokenAccountA,
-    //     userAgggrementA.publicKey,
-    //     this.tokenAccountB,
-    //     userAgggrementB.publicKey,
-    //     this.swapProgramId,
-    //     this.tokenProgramId,
-    //     flowRate,
-    //     // minimumTokenA,
-    //     // minimumTokenB,
-    //   ),
-    // );
-    console.log(" sending sendAndConfirmTransaction");
+    //   SystemProgram.createAccount({
+    //     fromPubkey: payer.publicKey,
+    //     newAccountPubkey: this.tokenSwap,
+    //     lamports: balanceNeeded,
+    //     space: TokenStreamAggrementLayout.span,
+    //     programId: swapProgramId,
+    //   }));
+  
+    transaction.add(
+      TokenSwap.startStreamTypesInstruction(
+        this.tokenSwap,
+        this.authority,
+        userTransferAuthority.publicKey,
+        this.tokenAccountA,
+        userAgggrementA.publicKey,
+        this.tokenAccountB,
+        userAgggrementB.publicKey,
+        this.swapProgramId,
+        this.tokenProgramId,
+        flowRate,
+        // minimumTokenA,
+        // minimumTokenB,
+      ),
+    );
+    console.log(" sending sendAndConfirmTransaction ***");
     
     return await sendAndConfirmTransaction(
       'withdraw',
       this.connection,
       transaction,
       this.payer,
-      userTransferAuthority,
+      this.tokenSwapAccount,
+      userAgggrementA,
+      userAgggrementB,
+      // userTransferAuthority,
     );
   }
 
@@ -1166,9 +1110,6 @@ export class TokenSwap {
     tokenSwap: PublicKey,
     authority: PublicKey,
     userTransferAuthority: PublicKey,
-    // poolMint: PublicKey,
-    // feeAccount: PublicKey,
-    // sourcePoolAccount: PublicKey,
     userAccountA: PublicKey,
     userAggrementA: PublicKey,
     userAccountB: PublicKey,
@@ -1176,26 +1117,7 @@ export class TokenSwap {
     swapProgramId: PublicKey,
     tokenProgramId: PublicKey,
     flowRate: number | Numberu64,
-    // minimumTokenA: number | Numberu64,
-    // minimumTokenB: number | Numberu64,
   ): TransactionInstruction {
-    const dataLayout = BufferLayout.struct([
-      BufferLayout.u8('instruction'),
-      Layout.uint64('flowRate'),
-      // Layout.uint64('minimumTokenA'),
-      // Layout.uint64('minimumTokenB'),
-    ]);
-
-    const data = Buffer.alloc(dataLayout.span);
-    dataLayout.encode(
-      {
-        instruction: 3, // Withdraw instruction
-        flowRate: new Numberu64(flowRate).toBuffer(),
-        // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
-        // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
-      },
-      data,
-    );
 
     const keys = [
       {pubkey: tokenSwap, isSigner: false, isWritable: false},
@@ -1207,9 +1129,27 @@ export class TokenSwap {
       {pubkey: userAggrementB, isSigner: false, isWritable: true},
       {pubkey: tokenProgramId, isSigner: false, isWritable: false},
     ];
-    console.log("keys", keys);
-    console.log("data", data);
-    
+
+    const dataLayout = BufferLayout.struct([
+      BufferLayout.u8('instruction'),
+      BufferLayout.nu64('flowRate'),
+    ]);
+
+    let data = Buffer.alloc(dataLayout.span);
+    const flowRateNum = 12124380;
+
+    {
+      const encodeLength = dataLayout.encode(
+        {
+          instruction: 3, // InitializeSwap instruction
+          // flowRate: new Numberu64(flowRateNum).toBuffer(),
+          flowRate: new Numberu64(flowRateNum),
+        },
+        data,
+      );
+      data = data.slice(0, encodeLength);
+    }
+
     return new TransactionInstruction({
       keys,
       programId: swapProgramId,
@@ -1295,7 +1235,7 @@ export class TokenSwap {
     const data = Buffer.alloc(dataLayout.span);
     dataLayout.encode(
       {
-        instruction: 2, // Withdraw instruction
+        instruction: 4, // Withdraw instruction
         flowRate: new Numberu64(flowRate).toBuffer(),
         // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
         // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
@@ -1350,46 +1290,26 @@ export class TokenStreamAggrement {
   constructor(
     private connection: Connection,
     public tokenStreamAggrement: PublicKey,
+    public tokenStreamAggrementA: PublicKey,
+    public tokenStreamAggrementB: PublicKey,
+    public userTransferAuthority: PublicKey,
+    public authority: PublicKey,
+    public userAccountA: PublicKey,
+    public userAccountB: PublicKey,
     public swapProgramId: PublicKey,
     public tokenProgramId: PublicKey,
-    public poolToken: PublicKey,
-    public feeAccount: PublicKey,
-    public authority: PublicKey,
-    public tokenAccountA: PublicKey,
-    public tokenAccountB: PublicKey,
-    public mintA: PublicKey,
-    public mintB: PublicKey,
-    // public tradeFeeNumerator: Numberu64,
-    // public tradeFeeDenominator: Numberu64,
-    // public ownerTradeFeeNumerator: Numberu64,
-    // public ownerTradeFeeDenominator: Numberu64,
-    // public ownerWithdrawFeeNumerator: Numberu64,
-    // public ownerWithdrawFeeDenominator: Numberu64,
-    // public hostFeeNumerator: Numberu64,
-    // public hostFeeDenominator: Numberu64,
-    // public curveType: number,
     public payer: Account,
   ) {
     this.connection = connection;
     this.tokenStreamAggrement = tokenStreamAggrement;
+    this.tokenStreamAggrementA = tokenStreamAggrementA;
+    this.tokenStreamAggrementB = tokenStreamAggrementB;
+    this.userTransferAuthority = userTransferAuthority;
+    this.authority = authority;
+    this.userAccountA = userAccountA;
+    this.userAccountB = userAccountB;
     this.swapProgramId = swapProgramId;
     this.tokenProgramId = tokenProgramId;
-    this.poolToken = poolToken;
-    this.feeAccount = feeAccount;
-    this.authority = authority;
-    this.tokenAccountA = tokenAccountA;
-    this.tokenAccountB = tokenAccountB;
-    this.mintA = mintA;
-    this.mintB = mintB;
-    // this.tradeFeeNumerator = tradeFeeNumerator;
-    // this.tradeFeeDenominator = tradeFeeDenominator;
-    // this.ownerTradeFeeNumerator = ownerTradeFeeNumerator;
-    // this.ownerTradeFeeDenominator = ownerTradeFeeDenominator;
-    // this.ownerWithdrawFeeNumerator = ownerWithdrawFeeNumerator;
-    // this.ownerWithdrawFeeDenominator = ownerWithdrawFeeDenominator;
-    // this.hostFeeNumerator = hostFeeNumerator;
-    // this.hostFeeDenominator = hostFeeDenominator;
-    // this.curveType = curveType;
     this.payer = payer;
   }
 
@@ -1405,76 +1325,50 @@ export class TokenStreamAggrement {
       TokenStreamAggrementLayout.span,
     );
   }
+
+  static async getMinBalanceRentForExemptTokenStream(
+    connection: Connection,
+  ): Promise<number> {
+    return await connection.getMinimumBalanceForRentExemption(
+      TokenStreamLayout.span,
+    );
+  }
   static createInitSwapInstruction(
     tokenStreamAggrementAccount: Account,
     authority: PublicKey,
-    tokenAccountA: PublicKey,
-    tokenAccountB: PublicKey,
-    tokenPool: PublicKey,
-    feeAccount: PublicKey,
-    tokenAccountPool: PublicKey,
-    tokenProgramId: PublicKey,
+    userTransferAuthority: PublicKey,
+    tokenStreamAggrementA: PublicKey,
+    tokenStreamAggrementB: PublicKey,
+    userAccountA: PublicKey,
+    userAccountB: PublicKey,    tokenProgramId: PublicKey,
     swapProgramId: PublicKey,
-    nonce: number,
-    // tradeFeeNumerator: number,
-    // tradeFeeDenominator: number,
-    // ownerTradeFeeNumerator: number,
-    // ownerTradeFeeDenominator: number,
-    // ownerWithdrawFeeNumerator: number,
-    // ownerWithdrawFeeDenominator: number,
-    // hostFeeNumerator: number,
-    // hostFeeDenominator: number,
-    // curveType: number,
-    // curveParameters: Numberu64 = new Numberu64(0),
   ): TransactionInstruction {
     const keys = [
+      // {pubkey: swapProgramId, isSigner: false, isWritable: false},
       {pubkey: tokenStreamAggrementAccount.publicKey, isSigner: false, isWritable: true},
       {pubkey: authority, isSigner: false, isWritable: false},
-      {pubkey: tokenAccountA, isSigner: false, isWritable: false},
-      // {pubkey: tokenAccountB, isSigner: false, isWritable: false},
-      {pubkey: tokenPool, isSigner: false, isWritable: true},
-      {pubkey: feeAccount, isSigner: false, isWritable: false},
-      {pubkey: tokenAccountPool, isSigner: false, isWritable: true},
+      {pubkey: userTransferAuthority, isSigner: false, isWritable: false},
+      {pubkey: userAccountA, isSigner: false, isWritable: false},
+      {pubkey: tokenStreamAggrementA, isSigner: false, isWritable: false},
+      {pubkey: userAccountB, isSigner: false, isWritable: false},
+      {pubkey: tokenStreamAggrementB, isSigner: false, isWritable: false},
       {pubkey: tokenProgramId, isSigner: false, isWritable: false},
     ];
     const commandDataLayout = BufferLayout.struct([
       BufferLayout.u8('instruction'),
-      BufferLayout.u8('nonce'),
-      // BufferLayout.nu64('tradeFeeNumerator'),
-      // BufferLayout.nu64('tradeFeeDenominator'),
-      // BufferLayout.nu64('ownerTradeFeeNumerator'),
-      // BufferLayout.nu64('ownerTradeFeeDenominator'),
-      // BufferLayout.nu64('ownerWithdrawFeeNumerator'),
-      // BufferLayout.nu64('ownerWithdrawFeeDenominator'),
-      // BufferLayout.nu64('hostFeeNumerator'),
-      // BufferLayout.nu64('hostFeeDenominator'),
-      // BufferLayout.u8('curveType'),
-      // BufferLayout.blob(32, 'curveParameters'),
+      BufferLayout.nu64('flowRate'),
     ]);
-    let data = Buffer.alloc(16);
-    // let data = Buffer.alloc(1024);
+    // let data = Buffer.alloc(9);
+    let data = Buffer.alloc(commandDataLayout.span);
 
-    // package curve parameters
-    // NOTE: currently assume all curves take a single parameter, u64 int
-    //       the remaining 24 of the 32 bytes available are filled with 0s
-    // let curveParamsBuffer = Buffer.alloc(32);
-    // curveParameters.toBuffer().copy(curveParamsBuffer);
+    const flowRateNum = 12124380;
 
     {
       const encodeLength = commandDataLayout.encode(
         {
-          instruction: 0, // InitializeSwap instruction
-          nonce,
-          // tradeFeeNumerator,
-          // tradeFeeDenominator,
-          // ownerTradeFeeNumerator,
-          // ownerTradeFeeDenominator,
-          // ownerWithdrawFeeNumerator,
-          // ownerWithdrawFeeDenominator,
-          // hostFeeNumerator,
-          // hostFeeDenominator,
-          // curveType,
-          // curveParameters: curveParamsBuffer,
+          instruction: 3, // InitializeSwap instruction
+          // flowRate: new Numberu64(flowRateNum).toBuffer(),
+          flowRate: new Numberu64(flowRateNum),
         },
         data,
       );
@@ -1506,38 +1400,29 @@ export class TokenStreamAggrement {
     );
 
     console.log(" tokenStreamAggrementData 1");
-    const poolToken = new PublicKey(tokenStreamAggrementData.tokenPool);
-    const feeAccount = new PublicKey(tokenStreamAggrementData.feeAccount);
-    const tokenAccountA = new PublicKey(tokenStreamAggrementData.tokenAccountA);
-    const tokenAccountB = new PublicKey(tokenStreamAggrementData.tokenAccountB);
-    console.log(" tokenStreamAggrementData 2");
-    const mintA = new PublicKey(tokenStreamAggrementData.mintA);
-    const mintB = new PublicKey(tokenStreamAggrementData.mintB);
+    const tokenStreamAggrement = new PublicKey(tokenStreamAggrementData.tokenStreamAggrement);
+    const tokenStreamAggrementA = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementA);
+    const tokenStreamAggrementB = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementB);
+    const userTransferAuthority = new PublicKey(tokenStreamAggrementData.userTransferAuthority);
+    const userAccountA = new PublicKey(tokenStreamAggrementData.userAccountA);
+    const userAccountB = new PublicKey(tokenStreamAggrementData.userAccountB);
+
     const tokenProgramId = new PublicKey(tokenStreamAggrementData.tokenProgramId);
 
     console.log(" tokenStreamAggrementData 3");
 
+
     return new TokenStreamAggrement(
       connection,
-      address,
+      tokenStreamAggrement,
+      tokenStreamAggrementA,
+      tokenStreamAggrementB,
+      userTransferAuthority,
+      authority,
+      userAccountA,
+      userAccountB,
       programId,
       tokenProgramId,
-      poolToken,
-      feeAccount,
-      authority,
-      tokenAccountA,
-      tokenAccountB,
-      mintA,
-      mintB,
-      // tradeFeeNumerator,
-      // tradeFeeDenominator,
-      // ownerTradeFeeNumerator,
-      // ownerTradeFeeDenominator,
-      // ownerWithdrawFeeNumerator,
-      // ownerWithdrawFeeDenominator,
-      // hostFeeNumerator,
-      // hostFeeDenominator,
-      // curveType,
       payer,
     );
   }
@@ -1564,91 +1449,84 @@ export class TokenStreamAggrement {
     connection: Connection,
     payer: Account,
     tokenStreamAggrementAccount: Account,
+    tokenStreamAggrementA: Account,
+    tokenStreamAggrementB: Account,
+    userTransferAuthority: Account,
     authority: PublicKey,
-    tokenAccountA: PublicKey,
-    tokenAccountB: PublicKey,
-    poolToken: PublicKey,
-    mintA: PublicKey,
-    mintB: PublicKey,
-    feeAccount: PublicKey,
-    tokenAccountPool: PublicKey,
+    userAccountA: Account,
+    userAccountB: Account,
     swapProgramId: PublicKey,
     tokenProgramId: PublicKey,
-    nonce: number,
-    // tradeFeeNumerator: number,
-    // tradeFeeDenominator: number,
-    // ownerTradeFeeNumerator: number,
-    // ownerTradeFeeDenominator: number,
-    // ownerWithdrawFeeNumerator: number,
-    // ownerWithdrawFeeDenominator: number,
-    // hostFeeNumerator: number,
-    // hostFeeDenominator: number,
-    // curveType: number,
-    // curveParameters?: Numberu64,
   ): Promise<TokenStreamAggrement> {
+    console.log('In createTokenStreamAggrement');
+
     let transaction;
     const tokenStreamAggrement = new TokenStreamAggrement(
       connection,
       tokenStreamAggrementAccount.publicKey,
+      tokenStreamAggrementA.publicKey,
+      tokenStreamAggrementB.publicKey,
+      userTransferAuthority.publicKey,
+      authority,
+      userAccountA.publicKey,
+      userAccountB.publicKey,
       swapProgramId,
       tokenProgramId,
-      poolToken,
-      feeAccount,
-      authority,
-      tokenAccountA,
-      tokenAccountB,
-      mintA,
-      mintB,
-      // new Numberu64(tradeFeeNumerator),
-      // new Numberu64(tradeFeeDenominator),
-      // new Numberu64(ownerTradeFeeNumerator),
-      // new Numberu64(ownerTradeFeeDenominator),
-      // new Numberu64(ownerWithdrawFeeNumerator),
-      // new Numberu64(ownerWithdrawFeeDenominator),
-      // new Numberu64(hostFeeNumerator),
-      // new Numberu64(hostFeeDenominator),
-      // curveType,
       payer,
     );
 
     // Allocate memory for the account
-    const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
+    const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStream(
       connection,
     );
+    const balanceNeededAggrement = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
+      connection,
+    );
+ 
+    console.log('In createTokenStreamAggrement balanceNeeded', balanceNeeded);
     transaction = new Transaction();
     transaction.add(
       SystemProgram.createAccount({
         fromPubkey: payer.publicKey,
-        newAccountPubkey: tokenStreamAggrementAccount.publicKey,
-        lamports: balanceNeeded,
+        newAccountPubkey: tokenStreamAggrementA.publicKey,
+        lamports: balanceNeededAggrement,
         space: TokenStreamAggrementLayout.span,
         programId: swapProgramId,
       }),
     );
 
+    transaction.add(
+      SystemProgram.createAccount({
+        fromPubkey: payer.publicKey,
+        newAccountPubkey: tokenStreamAggrementB.publicKey,
+        lamports: balanceNeededAggrement,
+        space: TokenStreamAggrementLayout.span,
+        programId: swapProgramId,
+      }),
+    );
+    // transaction.add(
+    //   SystemProgram.createAccount({
+    //     fromPubkey: payer.publicKey,
+    //     newAccountPubkey: tokenStreamAggrementAccount.publicKey,
+    //     lamports: balanceNeeded,
+    //     space: TokenStreamLayout.span,
+    //     programId: swapProgramId,
+    //   }),
+    // );
+
     const instruction = TokenStreamAggrement.createInitSwapInstruction(
       tokenStreamAggrementAccount,
       authority,
-      tokenAccountA,
-      tokenAccountB,
-      poolToken,
-      feeAccount,
-      tokenAccountPool,
+      userTransferAuthority.publicKey,
+      tokenStreamAggrementA.publicKey,
+      tokenStreamAggrementB.publicKey,
+      userAccountA.publicKey,
+      userAccountB.publicKey,
       tokenProgramId,
       swapProgramId,
-      nonce,
-      // tradeFeeNumerator,
-      // tradeFeeDenominator,
-      // ownerTradeFeeNumerator,
-      // ownerTradeFeeDenominator,
-      // ownerWithdrawFeeNumerator,
-      // ownerWithdrawFeeDenominator,
-      // hostFeeNumerator,
-      // hostFeeDenominator,
-      // curveType,
-      // curveParameters,
     );
 
+    console.log(" Gott INstructions");
     transaction.add(instruction);
     await sendAndConfirmTransaction(
       'createAccount and InitializeSwap',
@@ -1656,145 +1534,13 @@ export class TokenStreamAggrement {
       transaction,
       payer,
       tokenStreamAggrementAccount,
+      tokenStreamAggrementA,
+      tokenStreamAggrementB
     );
 
     return tokenStreamAggrement;
   }
 
-
-  // static async createTokenStreamAggrement(
-  //   connection: Connection,
-  //   payer: Account,
-  //   tokenStreamAggrementAccount: Account,
-  //   authority: PublicKey,
-  //   tokenAccountA: PublicKey,
-  //   tokenAccountB: PublicKey,
-  //   poolToken: PublicKey,
-  //   mintA: PublicKey,
-  //   mintB: PublicKey,
-  //   feeAccount: PublicKey,
-  //   tokenAccountPool: PublicKey,
-  //   swapProgramId: PublicKey,
-  //   tokenProgramId: PublicKey,
-  //   nonce: number,
-  //   // tradeFeeNumerator: number,
-  //   // tradeFeeDenominator: number,
-  //   // ownerTradeFeeNumerator: number,
-  //   // ownerTradeFeeDenominator: number,
-  //   // ownerWithdrawFeeNumerator: number,
-  //   // ownerWithdrawFeeDenominator: number,
-  //   // hostFeeNumerator: number,
-  //   // hostFeeDenominator: number,
-  //   // curveType: number,
-  //   // curveParameters?: Numberu64,
-  // ): Promise<TokenStreamAggrement> {
-  //   let transaction;
-  //   const tokenStreamAggrement = new TokenStreamAggrement(
-  //     connection,
-  //     tokenStreamAggrementAccount.publicKey,
-  //     swapProgramId,
-  //     tokenProgramId,
-  //     poolToken,
-  //     feeAccount,
-  //     authority,
-  //     tokenAccountA,
-  //     tokenAccountB,
-  //     mintA,
-  //     mintB,
-  //     // new Numberu64(tradeFeeNumerator),
-  //     // new Numberu64(tradeFeeDenominator),
-  //     // new Numberu64(ownerTradeFeeNumerator),
-  //     // new Numberu64(ownerTradeFeeDenominator),
-  //     // new Numberu64(ownerWithdrawFeeNumerator),
-  //     // new Numberu64(ownerWithdrawFeeDenominator),
-  //     // new Numberu64(hostFeeNumerator),
-  //     // new Numberu64(hostFeeDenominator),
-  //     // curveType,
-  //     payer,
-  //   );
-
-  //   // Allocate memory for the account
-  //   const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
-  //     connection,
-  //   );
-  //   transaction = new Transaction();
-  //   transaction.add(
-  //     SystemProgram.createAccount({
-  //       fromPubkey: payer.publicKey,
-  //       newAccountPubkey: tokenStreamAggrementAccount.publicKey,
-  //       lamports: balanceNeeded,
-  //       space: TokenStreamAggrementLayout.span,
-  //       programId: swapProgramId,
-  //     }),
-  //   );
-
-  //   const instruction = TokenStreamAggrement.createInitSwapInstruction(
-  //     tokenStreamAggrementAccount,
-  //     authority,
-  //     tokenAccountA,
-  //     tokenAccountB,
-  //     poolToken,
-  //     feeAccount,
-  //     tokenAccountPool,
-  //     tokenProgramId,
-  //     swapProgramId,
-  //     nonce,
-  //     // tradeFeeNumerator,
-  //     // tradeFeeDenominator,
-  //     // ownerTradeFeeNumerator,
-  //     // ownerTradeFeeDenominator,
-  //     // ownerWithdrawFeeNumerator,
-  //     // ownerWithdrawFeeDenominator,
-  //     // hostFeeNumerator,
-  //     // hostFeeDenominator,
-  //     // curveType,
-  //     // curveParameters,
-  //   );
-
-  //   transaction.add(instruction);
-  //   await sendAndConfirmTransaction(
-  //     'createAccount and InitializeSwap',
-  //     connection,
-  //     transaction,
-  //     payer,
-  //     tokenStreamAggrementAccount,
-  //   );
-
-  //   return tokenStreamAggrement;
-  // }
-
-
-
-
-  // async function createAggremeentAccount(owner: PublicKey, payer: Account, programId, ): Promise<PublicKey> {
-  //   // Allocate memory for the account
-  //   const balanceNeeded = await getMinBalanceRentForExemptTokenStream(
-  //     this.connection,
-  //   );
-  
-  //   const newAccount = Keypair.generate();
-  //   const transaction = new Transaction();
-  //   transaction.add(
-  //     SystemProgram.createAccount({
-  //       fromPubkey: payer.publicKey,
-  //       newAccountPubkey: newAccount.publicKey,
-  //       lamports: balanceNeeded,
-  //       space: AccountLayout.span,
-  //       programId: programId,
-  //     }),
-  //   );
-  
-  //   const mintPublicKey = this.publicKey;
-  //   transaction.add(
-  //     Token.createInitAccountInstruction(
-  //       this.programId,
-  //       mintPublicKey,
-  //       newAccount.publicKey,
-  //       owner,
-  //     ),
-  //   );
-  //     }
-  
 
     /**
    * Withdraw tokens from the pool
@@ -1819,14 +1565,6 @@ export class TokenStreamAggrement {
     let transaction;
     const userAgggrementA = Keypair.generate();
     const userAgggrementB = Keypair.generate();
-    // const userAgggrementA = new Account();
-
-
-    // const streamOwner = await newAccountWithLamports(connection, 2000000000);
-    // const payer = await newAccountWithLamports(connection, 2000000000 /* wag */);
-
-    console.log(" created usingg createWrappedNativeAccount");
-    
     // Allocate memory for the account
     const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
       this.connection,
@@ -1855,62 +1593,8 @@ export class TokenStreamAggrement {
         programId: swapProgramId,
       }));
 
-      // transaction.add(
-      //   Token.createInitAccountInstruction(
-      //     mintC.programId,
-      //     mintC.publicKey,
-      //     userAgggrementA.publicKey,
-      //     streamOwner.publicKey,
-      //   ),
-      // );
-    
-      // const mintPublicKey = this.publicKey;
-      // transaction.add( 
-      //   Token.createInitAccountInstruction(
-      //     swapProgramId,
-      //     mintB.publicKey,
-      //     userAgggrementA.publicKey,
-      //     streamOwner.publicKey,
-      //   ),
-      // );
-    // transaction.add(
-    //     SystemProgram.createAccount({
-    //       fromPubkey: payer.publicKey,
-    //       newAccountPubkey: userAgggrementB.publicKey,
-    //       lamports: balanceNeeded,
-    //       space: StreamAggrementLayout.span,
-    //       programId: swapProgramId,
-    //     }));
-    //   // const mintPublicKey = this.publicKey;
-    //   transaction.add(
-    //     Token.createInitAccountInstruction(
-    //       swapProgramId,
-    //       mintB.publicKey,
-    //       userAgggrementB.publicKey,
-    //       streamOwner.publicKey,
-    //     ),
-    //   );
 
-    // transaction.add(
-    //   TokenStreamAggrement.startStreamTypesInstruction(
-    //     this.tokenStreamAggrement,
-    //     this.authority,
-    //     userTransferAuthority.publicKey,
-    //     // this.poolToken,
-    //     // this.feeAccount,
-    //     // poolAccount,
-    //     this.tokenAccountA,
-    //     userAgggrementA.publicKey,
-    //     this.tokenAccountB,
-    //     userAgggrementB.publicKey,
-    //     this.swapProgramId,
-    //     this.tokenProgramId,
-    //     flowRate,
-    //     // minimumTokenA,
-    //     // minimumTokenB,
-    //   ),
-    // );
-    console.log(" sending sendAndConfirmTransaction");
+      console.log(" sending sendAndConfirmTransaction");
     
     return await sendAndConfirmTransaction(
       'withdraw',
@@ -1989,43 +1673,43 @@ export class TokenStreamAggrement {
    * @param minimumTokenA The minimum amount of token A to withdraw
    * @param minimumTokenB The minimum amount of token B to withdraw
    */
-  async stopStreamTypes(
-    userAgggrementA: PublicKey,
-    userAgggrementB: PublicKey,
-    userTransferAuthority: Account,
-    flowRate: number | Numberu64,
-    swapProgramId: PublicKey,
-  ): Promise<TransactionSignature> {
+  // async stopStreamTypes(
+  //   userAgggrementA: PublicKey,
+  //   userAgggrementB: PublicKey,
+  //   userTransferAuthority: Account,
+  //   flowRate: number | Numberu64,
+  //   swapProgramId: PublicKey,
+  // ): Promise<TransactionSignature> {
 
   
-    return await sendAndConfirmTransaction(
-      'withdraw',
-      this.connection,
-      new Transaction().add(
-        TokenStreamAggrement.stoptreamTypesInstruction(
-          this.tokenStreamAggrement,
-          this.authority,
-          userTransferAuthority.publicKey,
-          // this.poolToken,
-          // this.feeAccount,
-          // poolAccount,
-          this.tokenAccountA,
-          userAgggrementA,
-          this.tokenAccountB,
-          userAgggrementB,
-          // userAgggrementA,
-          // userAgggrementB,
-          this.swapProgramId,
-          this.tokenProgramId,
-          flowRate,
-          // minimumTokenA,
-          // minimumTokenB,
-        ),
-      ),
-      this.payer,
-      userTransferAuthority,
-    );
-  }
+  //   return await sendAndConfirmTransaction(
+  //     'withdraw',
+  //     this.connection,
+  //     new Transaction().add(
+  //       TokenStreamAggrement.stoptreamTypesInstruction(
+  //         this.tokenStreamAggrement,
+  //         this.authority,
+  //         userTransferAuthority.publicKey,
+  //         // this.poolToken,
+  //         // this.feeAccount,
+  //         // poolAccount,
+  //         this.tokenAccountA,
+  //         userAgggrementA,
+  //         this.tokenAccountB,
+  //         userAgggrementB,
+  //         // userAgggrementA,
+  //         // userAgggrementB,
+  //         this.swapProgramId,
+  //         this.tokenProgramId,
+  //         flowRate,
+  //         // minimumTokenA,
+  //         // minimumTokenB,
+  //       ),
+  //     ),
+  //     this.payer,
+  //     userTransferAuthority,
+  //   );
+  // }
 
   static stoptreamTypesInstruction(
     tokenStreamAggrement: PublicKey,

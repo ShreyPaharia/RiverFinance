@@ -17,17 +17,16 @@ async function main() {
   // console.log('****************************************');
   // await createTokenSwap(CurveType.ConstantPrice, new Numberu64(1));
   
-  console.log('****************************************');
+  // console.log('****************************************');
   console.log(
     'Run test: createTokenStreamAggrement ',
   );
-  console.log('****************************************');
-  await createTokenStreamAggrement();
-
   console.log(
     'Run test: createTokenSwap (constant product, used further in tests)',
   );
-  await createTokenSwap(CurveType.ConstantProduct);
+  await createTokenSwap();
+  console.log('****************************************');
+
   console.log('****************************************');
   console.log('Run test: deposit all token types');
   console.log('****************************************');
@@ -37,9 +36,10 @@ async function main() {
   console.log('****************************************');
   await withdrawAllTokenTypes();
   console.log('****************************************');
+  await createTokenStreamAggrement();
   console.log('Run test: Start & Stop Streaming');
   console.log('****************************************');
-  await startStreaming();
+  // await startStreaming();
   // console.log('****************************************');
   // console.log('Run test: create account, approve, swap all at once');
   // console.log('****************************************');
