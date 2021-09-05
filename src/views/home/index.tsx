@@ -21,7 +21,7 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
-  depositAllTokenTypesUI,
+  createTokenSwapUI ,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
@@ -46,7 +46,7 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 
-export const HomeView = () => {
+export const HomeView = ({ setLoading }) => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
@@ -55,6 +55,7 @@ export const HomeView = () => {
   const [amount, setAmount] = useState("");
   const [accounts, setAccounts] = useState([]);
   const { userAccounts } = useUserAccounts();
+  // const [isLoading, setLoading] = useState(false);
 
 
 const streamMenus = (
@@ -72,7 +73,8 @@ const streamMenus = (
   );
 
   const handleRequest = async () => {
-    await depositAllTokenTypesUI(publicKey, amount);
+    setLoading(true);
+    await createTokenSwapUI (publicKey, setLoading);
   };
 
 

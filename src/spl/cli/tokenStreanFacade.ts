@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   Account,
   Connection,
@@ -95,11 +96,11 @@ async function getConnection(): Promise<Connection> {
 }
 
 export async function createTokenSwap(): Promise<void> {
-  const senderAccount = new Account();
-  createTokenSwapUI(senderAccount.publicKey, POOL_TOKEN_AMOUNT);
+  owner = await newAccountWithLamports(connection, 1000000000);
+  createTokenSwapUI(owner.publicKey, ()=>{});
 }
 
-export async function createTokenSwapUI(senderAccount: PublicKey, tokenAmount: number): Promise<void> {
+export async function createTokenSwapUI(senderAccount: PublicKey, setLoading: Function): Promise<void> {
   const connection = await getConnection();
   const payer = await newAccountWithLamports(connection, 1000000000);
   owner = await newAccountWithLamports(connection, 1000000000);
@@ -185,6 +186,10 @@ export async function createTokenSwapUI(senderAccount: PublicKey, tokenAmount: n
     // curveParameters,
   );
 
+  if(setLoading){
+    setLoading(false);
+  }
+
   console.log('loading token swap');
   const fetchedTokenSwap = await TokenSwap.loadTokenSwap(
     connection,
@@ -193,45 +198,18 @@ export async function createTokenSwapUI(senderAccount: PublicKey, tokenAmount: n
     TOKEN_SWAP_PROGRAM_ID,
     swapPayer,
   );
+  console.log('**************Complete***************');
 
-  // assert(fetchedTokenSwap.tokenProgramId.equals(TOKEN_PROGRAM_ID));
-  // assert(fetchedTokenSwap.tokenAccountA.equals(tokenAccountA));
-  // assert(fetchedTokenSwap.tokenAccountB.equals(tokenAccountB));
-  // assert(fetchedTokenSwap.mintA.equals(mintA.publicKey));
-  // assert(fetchedTokenSwap.mintB.equals(mintB.publicKey));
-  // assert(fetchedTokenSwap.poolToken.equals(tokenPool.publicKey));
-  // assert(fetchedTokenSwap.feeAccount.equals(feeAccount));
-  // assert(
-  //   TRADING_FEE_NUMERATOR == fetchedTokenSwap.tradeFeeNumerator.toNumber(),
-  // );
-  // assert(
-  //   TRADING_FEE_DENOMINATOR == fetchedTokenSwap.tradeFeeDenominator.toNumber(),
-  // );
-  // assert(
-  //   OWNER_TRADING_FEE_NUMERATOR ==
-  //     fetchedTokenSwap.ownerTradeFeeNumerator.toNumber(),
-  // );
-  // assert(
-  //   OWNER_TRADING_FEE_DENOMINATOR ==
-  //     fetchedTokenSwap.ownerTradeFeeDenominator.toNumber(),
-  // );
-  // assert(
-  //   OWNER_WITHDRAW_FEE_NUMERATOR ==
-  //     fetchedTokenSwap.ownerWithdrawFeeNumerator.toNumber(),
-  // );
-  // assert(
-  //   OWNER_WITHDRAW_FEE_DENOMINATOR ==
-  //     fetchedTokenSwap.ownerWithdrawFeeDenominator.toNumber(),
-  // );
-  // assert(HOST_FEE_NUMERATOR == fetchedTokenSwap.hostFeeNumerator.toNumber());
-  // assert(
-  //   HOST_FEE_DENOMINATOR == fetchedTokenSwap.hostFeeDenominator.toNumber(),
-  // );
-  // assert(curveType == fetchedTokenSwap.curveType);
 }
 
 
 export async function createTokenStreamAggrement(): Promise<void> {
+  const reciverAccount = new Account();
+  const senderAccount = new Account();
+  createTokenStreamAggrementUI(senderAccount.publicKey, reciverAccount.publicKey, FLOW_RATE, ()=>{});
+}
+
+export async function createTokenStreamAggrementUI(senderPubKey: PublicKey, reciverPubKey: PublicKey, flowRate: number, setLoading: Function): Promise<void> {
   const connection = await getConnection();
   const payer = await newAccountWithLamports(connection, 1000000000);
   owner = await newAccountWithLamports(connection, 1000000000);
@@ -262,23 +240,20 @@ export async function createTokenStreamAggrement(): Promise<void> {
     TOKEN_PROGRAM_ID,
   );
 
-  // console.log('loading token stream aggrement');
-  // const fetchedTokenStreamAggrement = await TokenStreamAggrement.loadTokenStreamAggrement(
-  //   connection,
-  //   tokenStreamAggrementAccount.publicKey,
-  //   TOKEN_SWAP_PROGRAM_ID,
-  //   streamPayer,
-  // );
+  if(setLoading){
+    setLoading(false);
+  }
+  console.log('**************Complete***************');
 
 }
 
 export async function depositAllTokenTypes(): Promise<void> {
 
   const senderAccount = new Account();
-  depositAllTokenTypesUI(senderAccount.publicKey, POOL_TOKEN_AMOUNT);
+  depositAllTokenTypesUI(senderAccount.publicKey, POOL_TOKEN_AMOUNT, ()=>{});
 }
 
-export async function depositAllTokenTypesUI(senderAccount: PublicKey, tokenAmount: number): Promise<void> {
+export async function depositAllTokenTypesUI(senderAccount: PublicKey, POOL_TOKEN_AMOUNT2: number, setLoading: Function): Promise<void> {
   const poolMintInfo = await tokenPool.getMintInfo();
   const supply = poolMintInfo.supply.toNumber();
   const swapTokenA = await mintA.getAccountInfo(tokenAccountA);
@@ -321,12 +296,18 @@ export async function depositAllTokenTypesUI(senderAccount: PublicKey, tokenAmou
     userAccountB,
     newAccountPool,
     userTransferAuthority,
-    POOL_TOKEN_AMOUNT,
+    POOL_TOKEN_AMOUNT2,
     // tokenA,
     // tokenB,
   );
 
-  let info;
+  if(setLoading){
+    setLoading(false);
+  }
+
+  console.log('**************Complete***************');
+
+  // let info;
   // info = await mintA.getAccountInfo(userAccountA);
   // assert(info.amount.toNumber() == 0);
   // info = await mintB.getAccountInfo(userAccountB);
@@ -423,10 +404,10 @@ export async function depositAllTokenTypesUI(senderAccount: PublicKey, tokenAmou
 export async function withdrawAllTokenTypes(): Promise<void> {
   const reciverAccount = new Account();
 
-  withdrawAllTokenTypesUI(reciverAccount.publicKey, POOL_TOKEN_AMOUNT);
+  withdrawAllTokenTypesUI(reciverAccount.publicKey, POOL_TOKEN_AMOUNT, ()=>{});
 }
 
-export async function withdrawAllTokenTypesUI(reciverPubKey: PublicKey, POOL_TOKEN_AMOUNT2: number): Promise<void> {
+export async function withdrawAllTokenTypesUI(reciverPubKey: PublicKey, POOL_TOKEN_AMOUNT2: number, setLoading: Function): Promise<void> {
   const poolMintInfo = await tokenPool.getMintInfo();
   const supply = poolMintInfo.supply.toNumber();
   let swapTokenA = await mintA.getAccountInfo(tokenAccountA);
@@ -471,6 +452,11 @@ export async function withdrawAllTokenTypesUI(reciverPubKey: PublicKey, POOL_TOK
     tokenA,
     tokenB,
   );
+
+  if(setLoading){
+    setLoading(false);
+  }
+  console.log('**************Complete***************');
 
 }
 

@@ -27,17 +27,20 @@ import { DownOutlined, MoneyCollectOutlined , InboxOutlined } from '@ant-design/
 
 
 
-export const WithdrawView = () => {
+export const WithdrawView = ({ setLoading }) => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
 
   const [streamList, setStreamList] = useState([{key:"DAI", value:"DAI"}]);
   const [stream, setStream] = useState("Select Token");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState();
+  // const [isLoading, setLoading] = useState(false);
+
 
   const handleRequest = async () => {
-    await withdrawAllTokenTypesUI(publicKey, amount);
+    setLoading(true);
+    await withdrawAllTokenTypesUI(publicKey, amount, setLoading);
   };
 
 const streamMenus = (

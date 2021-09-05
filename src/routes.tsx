@@ -79,7 +79,7 @@ export function Routes() {
                             Withdraw
                             </Link>
                             </Menu.Item>
-                          <Menu.Item key="3" icon={<SyncOutlined spin/>} >
+                          <Menu.Item key="4" icon={<SyncOutlined spin/>} >
                             {/* <Link onClick={() => { setRoute("/withdraw");}} to="/withdraw"> */}
                             <Link to="/stream">
                             Stream
@@ -117,12 +117,12 @@ export function Routes() {
                           <Spin size="large" spinning={isLoading}/>
                         </Space>
                 <Switch>
-                  <Route exact path="/" component={() => <HomeView />} />
+                  <Route exact path="/" component={() => <HomeView setLoading={setLoading} />} />
                   <Route exact path="/faucet" children={<FaucetView />} />
                   <Route exact path="/initialize" children={<InitializeView />} />
-                  <Route exact path="/deposit" children={<DepositView />} />
-                  <Route exact path="/withdraw" children={<WithdrawView />} />
-                  <Route exact path="/stream" children={<StreamView  />} />
+                  <Route exact path="/deposit" children={<DepositView setLoading={setLoading}/>} />
+                  <Route exact path="/withdraw" children={<WithdrawView setLoading={setLoading}/>} />
+                  <Route exact path="/stream" children={<StreamView  setLoading={setLoading}/>} />
                 </Switch>
                       </Content>
                       </Layout>

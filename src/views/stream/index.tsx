@@ -21,11 +21,11 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
-  depositAllTokenTypesUI,
+  createTokenStreamAggrementUI,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
-import { DownOutlined, MoneyCollectOutlined, InboxOutlined } from '@ant-design/icons';
+import { AreaChartOutlined, MoneyCollectOutlined, InboxOutlined } from '@ant-design/icons';
 
 
 let tokenStream;
@@ -45,16 +45,20 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 
-export const StreamView = () => {
+export const StreamView = ({ setLoading }) => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
-  const handleRequest = async () => {
-    await depositAllTokenTypesUI(publicKey, amount);
-  };
-
   const [flowRate, setFlowRate] = useState(1222);
   const [receiverAddr, setReceiverAddr] = useState();
+  // const [isLoading, setLoading] = useState(false);
+
+
+  const handleRequest = async () => {
+    setLoading(true);
+    await createTokenStreamAggrementUI(publicKey, receiverAddr, flowRate, setLoading);
+  };
+
 
 
   return (
@@ -62,7 +66,7 @@ export const StreamView = () => {
       <div>
         <div className="deposit-input-title" style={{ margin: 10 }}>
         <div style={{ margin: '24px 0' }} />
-        <Input addonBefore="$"
+        <Input addonBefore="#"
               style={{ width: 200  }}
               placeholder="Recipient Address"
               autoComplete="off"
@@ -72,7 +76,9 @@ export const StreamView = () => {
             />
 
           <div style={{ margin: '24px 0'}} />
-          <Input addonBefore="$"
+          <Input 
+              // addonBefore="$"
+              prefix={<AreaChartOutlined />}
               style={{ width: 200  }}
               placeholder="Flow rate"
               autoComplete="off"

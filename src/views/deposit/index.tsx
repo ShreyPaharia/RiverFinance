@@ -45,18 +45,19 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 
-export const DepositView = () => {
+export const DepositView = ({ setLoading }) => {
   const connection = useConnection();
   const { publicKey } = useWallet();
-
-  const handleRequest = async () => {
-    await depositAllTokenTypesUI(publicKey, amount);
-  };
 
   const [streamList, setStreamList] = useState([{key:"DAI", value:"DAI"}]);
   const [stream, setStream] = useState("Select Token");
   const [amount, setAmount] = useState("");
+  // const [isLoading, setLoading] = useState(false);
 
+  const handleRequest = async () => {
+    setLoading(true);
+    await depositAllTokenTypesUI(publicKey, amount, setLoading);
+  };
 
 const streamMenus = (
     <Menu onClick={e => {
