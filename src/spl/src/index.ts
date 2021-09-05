@@ -230,13 +230,13 @@ export class TokenSwap {
       TokenSwapLayout.span,
     );
   }
-  static async getMinBalanceRentForExemptTokenStreamAggrement(
-    connection: Connection,
-  ): Promise<number> {
-    return await connection.getMinimumBalanceForRentExemption(
-      TokenStreamAggrementLayout.span,
-    );
-  }
+  // static async getMinBalanceRentForExemptTokenStreamAggrement(
+  //   connection: Connection,
+  // ): Promise<number> {
+  //   return await connection.getMinimumBalanceForRentExemption(
+  //     TokenStreamAggrementLayout.span,
+  //   );
+  // }
 
   static createInitSwapInstruction(
     tokenSwapAccount: Account,
@@ -260,6 +260,8 @@ export class TokenSwap {
     // curveType: number,
     // curveParameters: Numberu64 = new Numberu64(0),
   ): TransactionInstruction {
+    console.log(" tokenProgramId ", tokenProgramId);
+
     const keys = [
       {pubkey: tokenSwapAccount.publicKey, isSigner: false, isWritable: true},
       {pubkey: authority, isSigner: false, isWritable: false},
@@ -1157,167 +1159,6 @@ export class TokenSwap {
     });
   }
 
-
-
-      /**
-   * Withdraw tokens from the pool
-   *
-   * @param userAccountA User account for token A
-   * @param userAccountB User account for token B
-   * @param poolAccount User account for pool token
-   * @param userTransferAuthority Account delegated to transfer user's tokens
-   * @param flowRate Amount of pool tokens to burn
-   * @param minimumTokenA The minimum amount of token A to withdraw
-   * @param minimumTokenB The minimum amount of token B to withdraw
-   */
-  async stopStreamTypes(
-    userAgggrementA: PublicKey,
-    userAgggrementB: PublicKey,
-    userTransferAuthority: Account,
-    flowRate: number | Numberu64,
-    swapProgramId: PublicKey,
-  ): Promise<TransactionSignature> {
-
-  
-    return await sendAndConfirmTransaction(
-      'withdraw',
-      this.connection,
-      new Transaction().add(
-        TokenSwap.stoptreamTypesInstruction(
-          this.tokenSwap,
-          this.authority,
-          userTransferAuthority.publicKey,
-          // this.poolToken,
-          // this.feeAccount,
-          // poolAccount,
-          this.tokenAccountA,
-          userAgggrementA,
-          this.tokenAccountB,
-          userAgggrementB,
-          // userAgggrementA,
-          // userAgggrementB,
-          this.swapProgramId,
-          this.tokenProgramId,
-          flowRate,
-          // minimumTokenA,
-          // minimumTokenB,
-        ),
-      ),
-      this.payer,
-      userTransferAuthority,
-    );
-  }
-
-  static stoptreamTypesInstruction(
-    tokenSwap: PublicKey,
-    authority: PublicKey,
-    userTransferAuthority: PublicKey,
-    // poolMint: PublicKey,
-    // feeAccount: PublicKey,
-    // sourcePoolAccount: PublicKey,
-    userAccountA: PublicKey,
-    userAggrementA: PublicKey,
-    userAccountB: PublicKey,
-    userAggrementB: PublicKey,
-    swapProgramId: PublicKey,
-    tokenProgramId: PublicKey,
-    flowRate: number | Numberu64,
-    // minimumTokenA: number | Numberu64,
-    // minimumTokenB: number | Numberu64,
-  ): TransactionInstruction {
-    const dataLayout = BufferLayout.struct([
-      BufferLayout.u8('instruction'),
-      Layout.uint64('flowRate'),
-      // Layout.uint64('minimumTokenA'),
-      // Layout.uint64('minimumTokenB'),
-    ]);
-
-    const data = Buffer.alloc(dataLayout.span);
-    dataLayout.encode(
-      {
-        instruction: 4, // Withdraw instruction
-        flowRate: new Numberu64(flowRate).toBuffer(),
-        // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
-        // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
-      },
-      data,
-    );
-
-    const keys = [
-      {pubkey: tokenSwap, isSigner: false, isWritable: false},
-      {pubkey: authority, isSigner: false, isWritable: false},
-      {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
-      {pubkey: userAccountA, isSigner: false, isWritable: true},
-      {pubkey: userAggrementA, isSigner: false, isWritable: true},
-      {pubkey: userAccountB, isSigner: false, isWritable: true},
-      {pubkey: userAggrementB, isSigner: false, isWritable: true},
-      {pubkey: tokenProgramId, isSigner: false, isWritable: false},
-    ];
-    return new TransactionInstruction({
-      keys,
-      programId: swapProgramId,
-      data,
-    });
-  }
-}
-
-
-export class TokenStreamAggrement {
-  /**
-   * Create a Token object attached to the specific token
-   *
-   * @param connection The connection to use
-   * @param tokenStreamAggrement The token swap account
-   * @param swapProgramId The program ID of the token-swap program
-   * @param tokenProgramId The program ID of the token program
-   * @param poolToken The pool token
-   * @param authority The authority over the swap and accounts
-   * @param tokenAccountA The token swap's Token A account
-   * @param tokenAccountB The token swap's Token B account
-   * @param mintA The mint of Token A
-   * @param mintB The mint of Token B
-  //  * @param tradeFeeNumerator The trade fee numerator
-  //  * @param tradeFeeDenominator The trade fee denominator
-  //  * @param ownerTradeFeeNumerator The owner trade fee numerator
-  //  * @param ownerTradeFeeDenominator The owner trade fee denominator
-  //  * @param ownerWithdrawFeeNumerator The owner withdraw fee numerator
-  //  * @param ownerWithdrawFeeDenominator The owner withdraw fee denominator
-  //  * @param hostFeeNumerator The host fee numerator
-  //  * @param hostFeeDenominator The host fee denominator
-  //  * @param curveType The curve type
-   * @param payer Pays for the transaction
-   */
-  constructor(
-    private connection: Connection,
-    public tokenStreamAggrement: PublicKey,
-    public tokenStreamAggrementA: PublicKey,
-    public tokenStreamAggrementB: PublicKey,
-    public userTransferAuthority: PublicKey,
-    public authority: PublicKey,
-    public userAccountA: PublicKey,
-    public userAccountB: PublicKey,
-    public swapProgramId: PublicKey,
-    public tokenProgramId: PublicKey,
-    public payer: Account,
-  ) {
-    this.connection = connection;
-    this.tokenStreamAggrement = tokenStreamAggrement;
-    this.tokenStreamAggrementA = tokenStreamAggrementA;
-    this.tokenStreamAggrementB = tokenStreamAggrementB;
-    this.userTransferAuthority = userTransferAuthority;
-    this.authority = authority;
-    this.userAccountA = userAccountA;
-    this.userAccountB = userAccountB;
-    this.swapProgramId = swapProgramId;
-    this.tokenProgramId = tokenProgramId;
-    this.payer = payer;
-  }
-
-  /**
-   * Get the minimum balance for the token swap account to be rent exempt
-   *
-   * @return Number of lamports required
-   */
   static async getMinBalanceRentForExemptTokenStreamAggrement(
     connection: Connection,
   ): Promise<number> {
@@ -1333,26 +1174,29 @@ export class TokenStreamAggrement {
       TokenStreamLayout.span,
     );
   }
-  static createInitSwapInstruction(
-    tokenStreamAggrementAccount: Account,
+  static createInitStreamInstruction(
+    tokenSwap: PublicKey,
     authority: PublicKey,
     userTransferAuthority: PublicKey,
     tokenStreamAggrementA: PublicKey,
     tokenStreamAggrementB: PublicKey,
     userAccountA: PublicKey,
-    userAccountB: PublicKey,    tokenProgramId: PublicKey,
+    userAccountB: PublicKey,    
     swapProgramId: PublicKey,
+    tokenProgramId: PublicKey,
   ): TransactionInstruction {
+    console.log(" tokenSwap swapProgramId tokenProgramId", tokenSwap, swapProgramId, tokenProgramId);
+
     const keys = [
-      // {pubkey: swapProgramId, isSigner: false, isWritable: false},
-      {pubkey: tokenStreamAggrementAccount.publicKey, isSigner: false, isWritable: true},
+      {pubkey: tokenSwap, isSigner: false, isWritable: true},
       {pubkey: authority, isSigner: false, isWritable: false},
       {pubkey: userTransferAuthority, isSigner: false, isWritable: false},
       {pubkey: userAccountA, isSigner: false, isWritable: false},
       {pubkey: tokenStreamAggrementA, isSigner: false, isWritable: false},
       {pubkey: userAccountB, isSigner: false, isWritable: false},
       {pubkey: tokenStreamAggrementB, isSigner: false, isWritable: false},
-      {pubkey: tokenProgramId, isSigner: false, isWritable: false},
+      {pubkey: swapProgramId, isSigner: false, isWritable: false},
+      // {pubkey: tokenProgramId, isSigner: false, isWritable: false},
     ];
     const commandDataLayout = BufferLayout.struct([
       BufferLayout.u8('instruction'),
@@ -1381,51 +1225,6 @@ export class TokenStreamAggrement {
     });
   }
 
-  static async loadTokenStreamAggrement(
-    connection: Connection,
-    address: PublicKey,
-    programId: PublicKey,
-    payer: Account,
-  ): Promise<TokenStreamAggrement> {
-    const data = await loadAccount(connection, address, programId);
-    const tokenStreamAggrementData = TokenStreamAggrementLayout.decode(data);
-    console.log(" tokenStreamAggrementData ", tokenStreamAggrementData);
-    if (!tokenStreamAggrementData.isInitialized) {
-      throw new Error(`Invalid token swap state`);
-    }
-
-    const [authority] = await PublicKey.findProgramAddress(
-      [address.toBuffer()],
-      programId,
-    );
-
-    console.log(" tokenStreamAggrementData 1");
-    const tokenStreamAggrement = new PublicKey(tokenStreamAggrementData.tokenStreamAggrement);
-    const tokenStreamAggrementA = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementA);
-    const tokenStreamAggrementB = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementB);
-    const userTransferAuthority = new PublicKey(tokenStreamAggrementData.userTransferAuthority);
-    const userAccountA = new PublicKey(tokenStreamAggrementData.userAccountA);
-    const userAccountB = new PublicKey(tokenStreamAggrementData.userAccountB);
-
-    const tokenProgramId = new PublicKey(tokenStreamAggrementData.tokenProgramId);
-
-    console.log(" tokenStreamAggrementData 3");
-
-
-    return new TokenStreamAggrement(
-      connection,
-      tokenStreamAggrement,
-      tokenStreamAggrementA,
-      tokenStreamAggrementB,
-      userTransferAuthority,
-      authority,
-      userAccountA,
-      userAccountB,
-      programId,
-      tokenProgramId,
-      payer,
-    );
-  }
 
   /**
    * Create a new Token Swap
@@ -1445,7 +1244,7 @@ export class TokenStreamAggrement {
    * @param feeDenominator Denominator of the fee ratio
    * @return Token object for the newly minted token, Public key of the account holding the total supply of new tokens
    */
-  static async createTokenStreamAggrement(
+  async createTokenStreamAggrement(
     connection: Connection,
     payer: Account,
     tokenStreamAggrementAccount: Account,
@@ -1453,41 +1252,28 @@ export class TokenStreamAggrement {
     tokenStreamAggrementB: Account,
     userTransferAuthority: Account,
     authority: PublicKey,
-    userAccountA: Account,
-    userAccountB: Account,
+    userAccountA: PublicKey,
+    userAccountB: PublicKey,
     swapProgramId: PublicKey,
     tokenProgramId: PublicKey,
-  ): Promise<TokenStreamAggrement> {
+  ): Promise<void> {
     console.log('In createTokenStreamAggrement');
 
     let transaction;
-    const tokenStreamAggrement = new TokenStreamAggrement(
-      connection,
-      tokenStreamAggrementAccount.publicKey,
-      tokenStreamAggrementA.publicKey,
-      tokenStreamAggrementB.publicKey,
-      userTransferAuthority.publicKey,
-      authority,
-      userAccountA.publicKey,
-      userAccountB.publicKey,
-      swapProgramId,
-      tokenProgramId,
-      payer,
-    );
-
     // Allocate memory for the account
-    const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStream(
+    const balanceNeeded = await TokenSwap.getMinBalanceRentForExemptTokenStream(
       connection,
     );
-    const balanceNeededAggrement = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
+    const balanceNeededAggrement = await TokenSwap.getMinBalanceRentForExemptTokenStreamAggrement(
       connection,
     );
  
     console.log('In createTokenStreamAggrement balanceNeeded', balanceNeeded);
     transaction = new Transaction();
+
     transaction.add(
       SystemProgram.createAccount({
-        fromPubkey: payer.publicKey,
+        fromPubkey: this.payer.publicKey,
         newAccountPubkey: tokenStreamAggrementA.publicKey,
         lamports: balanceNeededAggrement,
         space: TokenStreamAggrementLayout.span,
@@ -1497,13 +1283,14 @@ export class TokenStreamAggrement {
 
     transaction.add(
       SystemProgram.createAccount({
-        fromPubkey: payer.publicKey,
+        fromPubkey: this.payer.publicKey,
         newAccountPubkey: tokenStreamAggrementB.publicKey,
         lamports: balanceNeededAggrement,
         space: TokenStreamAggrementLayout.span,
         programId: swapProgramId,
       }),
     );
+
     // transaction.add(
     //   SystemProgram.createAccount({
     //     fromPubkey: payer.publicKey,
@@ -1514,16 +1301,16 @@ export class TokenStreamAggrement {
     //   }),
     // );
 
-    const instruction = TokenStreamAggrement.createInitSwapInstruction(
-      tokenStreamAggrementAccount,
+    const instruction = TokenSwap.createInitStreamInstruction(
+      this.tokenSwap,
       authority,
       userTransferAuthority.publicKey,
       tokenStreamAggrementA.publicKey,
       tokenStreamAggrementB.publicKey,
-      userAccountA.publicKey,
-      userAccountB.publicKey,
-      tokenProgramId,
-      swapProgramId,
+      userAccountA,
+      userAccountB,
+      this.swapProgramId,
+      this.tokenProgramId,
     );
 
     console.log(" Gott INstructions");
@@ -1532,147 +1319,28 @@ export class TokenStreamAggrement {
       'createAccount and InitializeSwap',
       connection,
       transaction,
-      payer,
-      tokenStreamAggrementAccount,
+      this.payer,
+      // this.tokenSw,
       tokenStreamAggrementA,
       tokenStreamAggrementB
     );
 
-    return tokenStreamAggrement;
-  }
-
-
-    /**
-   * Withdraw tokens from the pool
-   *
-   * @param userAccountA User account for token A
-   * @param userAccountB User account for token B
-   * @param poolAccount User account for pool token
-   * @param userTransferAuthority Account delegated to transfer user's tokens
-   * @param poolTokenAmount Amount of pool tokens to burn
-   * @param minimumTokenA The minimum amount of token A to withdraw
-   * @param minimumTokenB The minimum amount of token B to withdraw
-   */
-  async startStreamTypes(
-    // userAgggrementA: PublicKey,
-    // userAgggrementB: PublicKey,
-    userTransferAuthority: Account,
-    flowRate: number | Numberu64,
-    swapProgramId: PublicKey,
-    payer: Signer,
-    streamOwner: Account,
-  ): Promise<TransactionSignature> {
-    let transaction;
-    const userAgggrementA = Keypair.generate();
-    const userAgggrementB = Keypair.generate();
-    // Allocate memory for the account
-    const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
-      this.connection,
-    );
-
-    console.log('creating token C');
-    const mintC = await Token.createMint(
-      this.connection,
-      payer,
-      streamOwner.publicKey,
-      null,
-      2,
-      swapProgramId,
-    );
-    console.log("payer ", payer.publicKey);
-    console.log("userAgggrementA ", userAgggrementA.publicKey);
-    console.log("streamOwner ", streamOwner.publicKey);
-
-    transaction = new Transaction();
-    transaction.add(
-      SystemProgram.createAccount({
-        fromPubkey: payer.publicKey,
-        newAccountPubkey: userAgggrementA.publicKey,
-        lamports: balanceNeeded,
-        space: TokenStreamAggrementLayout.span,
-        programId: swapProgramId,
-      }));
-
-
-      console.log(" sending sendAndConfirmTransaction");
-    
-    return await sendAndConfirmTransaction(
-      'withdraw',
-      this.connection,
-      transaction,
-      this.payer,
-      userTransferAuthority,
-    );
-  }
-
-  static startStreamTypesInstruction(
-    tokenStreamAggrement: PublicKey,
-    authority: PublicKey,
-    userTransferAuthority: PublicKey,
-    // poolMint: PublicKey,
-    // feeAccount: PublicKey,
-    // sourcePoolAccount: PublicKey,
-    userAccountA: PublicKey,
-    userAggrementA: PublicKey,
-    userAccountB: PublicKey,
-    userAggrementB: PublicKey,
-    swapProgramId: PublicKey,
-    tokenProgramId: PublicKey,
-    flowRate: number | Numberu64,
-    // minimumTokenA: number | Numberu64,
-    // minimumTokenB: number | Numberu64,
-  ): TransactionInstruction {
-    const dataLayout = BufferLayout.struct([
-      BufferLayout.u8('instruction'),
-      Layout.uint64('flowRate'),
-      // Layout.uint64('minimumTokenA'),
-      // Layout.uint64('minimumTokenB'),
-    ]);
-
-    const data = Buffer.alloc(dataLayout.span);
-    dataLayout.encode(
-      {
-        instruction: 3, // Withdraw instruction
-        flowRate: new Numberu64(flowRate).toBuffer(),
-        // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
-        // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
-      },
-      data,
-    );
-
-    const keys = [
-      {pubkey: tokenStreamAggrement, isSigner: false, isWritable: false},
-      {pubkey: authority, isSigner: false, isWritable: false},
-      {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
-      {pubkey: userAccountA, isSigner: false, isWritable: true},
-      {pubkey: userAggrementA, isSigner: false, isWritable: true},
-      {pubkey: userAccountB, isSigner: false, isWritable: true},
-      {pubkey: userAggrementB, isSigner: false, isWritable: true},
-      {pubkey: tokenProgramId, isSigner: false, isWritable: false},
-    ];
-    console.log("keys", keys);
-    console.log("data", data);
-    
-    return new TransactionInstruction({
-      keys,
-      programId: swapProgramId,
-      data,
-    });
+    // return tokenStreamAggrement;
   }
 
 
 
-      /**
-   * Withdraw tokens from the pool
-   *
-   * @param userAccountA User account for token A
-   * @param userAccountB User account for token B
-   * @param poolAccount User account for pool token
-   * @param userTransferAuthority Account delegated to transfer user's tokens
-   * @param flowRate Amount of pool tokens to burn
-   * @param minimumTokenA The minimum amount of token A to withdraw
-   * @param minimumTokenB The minimum amount of token B to withdraw
-   */
+  //     /**
+  //  * Withdraw tokens from the pool
+  //  *
+  //  * @param userAccountA User account for token A
+  //  * @param userAccountB User account for token B
+  //  * @param poolAccount User account for pool token
+  //  * @param userTransferAuthority Account delegated to transfer user's tokens
+  //  * @param flowRate Amount of pool tokens to burn
+  //  * @param minimumTokenA The minimum amount of token A to withdraw
+  //  * @param minimumTokenB The minimum amount of token B to withdraw
+  //  */
   // async stopStreamTypes(
   //   userAgggrementA: PublicKey,
   //   userAgggrementB: PublicKey,
@@ -1686,8 +1354,8 @@ export class TokenStreamAggrement {
   //     'withdraw',
   //     this.connection,
   //     new Transaction().add(
-  //       TokenStreamAggrement.stoptreamTypesInstruction(
-  //         this.tokenStreamAggrement,
+  //       TokenSwap.stoptreamTypesInstruction(
+  //         this.tokenSwap,
   //         this.authority,
   //         userTransferAuthority.publicKey,
   //         // this.poolToken,
@@ -1711,55 +1379,559 @@ export class TokenStreamAggrement {
   //   );
   // }
 
-  static stoptreamTypesInstruction(
-    tokenStreamAggrement: PublicKey,
-    authority: PublicKey,
-    userTransferAuthority: PublicKey,
-    // poolMint: PublicKey,
-    // feeAccount: PublicKey,
-    // sourcePoolAccount: PublicKey,
-    userAccountA: PublicKey,
-    userAggrementA: PublicKey,
-    userAccountB: PublicKey,
-    userAggrementB: PublicKey,
-    swapProgramId: PublicKey,
-    tokenProgramId: PublicKey,
-    flowRate: number | Numberu64,
-    // minimumTokenA: number | Numberu64,
-    // minimumTokenB: number | Numberu64,
-  ): TransactionInstruction {
-    const dataLayout = BufferLayout.struct([
-      BufferLayout.u8('instruction'),
-      Layout.uint64('flowRate'),
-      // Layout.uint64('minimumTokenA'),
-      // Layout.uint64('minimumTokenB'),
-    ]);
+  // static stoptreamTypesInstruction(
+  //   tokenSwap: PublicKey,
+  //   authority: PublicKey,
+  //   userTransferAuthority: PublicKey,
+  //   // poolMint: PublicKey,
+  //   // feeAccount: PublicKey,
+  //   // sourcePoolAccount: PublicKey,
+  //   userAccountA: PublicKey,
+  //   userAggrementA: PublicKey,
+  //   userAccountB: PublicKey,
+  //   userAggrementB: PublicKey,
+  //   swapProgramId: PublicKey,
+  //   tokenProgramId: PublicKey,
+  //   flowRate: number | Numberu64,
+  //   // minimumTokenA: number | Numberu64,
+  //   // minimumTokenB: number | Numberu64,
+  // ): TransactionInstruction {
+  //   const dataLayout = BufferLayout.struct([
+  //     BufferLayout.u8('instruction'),
+  //     Layout.uint64('flowRate'),
+  //     // Layout.uint64('minimumTokenA'),
+  //     // Layout.uint64('minimumTokenB'),
+  //   ]);
 
-    const data = Buffer.alloc(dataLayout.span);
-    dataLayout.encode(
-      {
-        instruction: 2, // Withdraw instruction
-        flowRate: new Numberu64(flowRate).toBuffer(),
-        // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
-        // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
-      },
-      data,
-    );
+  //   const data = Buffer.alloc(dataLayout.span);
+  //   dataLayout.encode(
+  //     {
+  //       instruction: 4, // Withdraw instruction
+  //       flowRate: new Numberu64(flowRate).toBuffer(),
+  //       // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
+  //       // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
+  //     },
+  //     data,
+  //   );
 
-    const keys = [
-      {pubkey: tokenStreamAggrement, isSigner: false, isWritable: false},
-      {pubkey: authority, isSigner: false, isWritable: false},
-      {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
-      {pubkey: userAccountA, isSigner: false, isWritable: true},
-      {pubkey: userAggrementA, isSigner: false, isWritable: true},
-      {pubkey: userAccountB, isSigner: false, isWritable: true},
-      {pubkey: userAggrementB, isSigner: false, isWritable: true},
-      {pubkey: tokenProgramId, isSigner: false, isWritable: false},
-    ];
-    return new TransactionInstruction({
-      keys,
-      programId: swapProgramId,
-      data,
-    });
-  }
+  //   const keys = [
+  //     {pubkey: tokenSwap, isSigner: false, isWritable: false},
+  //     {pubkey: authority, isSigner: false, isWritable: false},
+  //     {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
+  //     {pubkey: userAccountA, isSigner: false, isWritable: true},
+  //     {pubkey: userAggrementA, isSigner: false, isWritable: true},
+  //     {pubkey: userAccountB, isSigner: false, isWritable: true},
+  //     {pubkey: userAggrementB, isSigner: false, isWritable: true},
+  //     {pubkey: tokenProgramId, isSigner: false, isWritable: false},
+  //   ];
+  //   return new TransactionInstruction({
+  //     keys,
+  //     programId: swapProgramId,
+  //     data,
+  //   });
+  // }
 }
+
+
+// export class TokenStreamAggrement {
+//   /**
+//    * Create a Token object attached to the specific token
+//    *
+//    * @param connection The connection to use
+//    * @param tokenStreamAggrement The token swap account
+//    * @param swapProgramId The program ID of the token-swap program
+//    * @param tokenProgramId The program ID of the token program
+//    * @param poolToken The pool token
+//    * @param authority The authority over the swap and accounts
+//    * @param tokenAccountA The token swap's Token A account
+//    * @param tokenAccountB The token swap's Token B account
+//    * @param mintA The mint of Token A
+//    * @param mintB The mint of Token B
+//   //  * @param tradeFeeNumerator The trade fee numerator
+//   //  * @param tradeFeeDenominator The trade fee denominator
+//   //  * @param ownerTradeFeeNumerator The owner trade fee numerator
+//   //  * @param ownerTradeFeeDenominator The owner trade fee denominator
+//   //  * @param ownerWithdrawFeeNumerator The owner withdraw fee numerator
+//   //  * @param ownerWithdrawFeeDenominator The owner withdraw fee denominator
+//   //  * @param hostFeeNumerator The host fee numerator
+//   //  * @param hostFeeDenominator The host fee denominator
+//   //  * @param curveType The curve type
+//    * @param payer Pays for the transaction
+//    */
+//   constructor(
+//     private connection: Connection,
+//     public tokenStreamAggrement: PublicKey,
+//     public tokenStreamAggrementA: PublicKey,
+//     public tokenStreamAggrementB: PublicKey,
+//     public userTransferAuthority: PublicKey,
+//     public authority: PublicKey,
+//     public userAccountA: PublicKey,
+//     public userAccountB: PublicKey,
+//     public swapProgramId: PublicKey,
+//     public tokenProgramId: PublicKey,
+//     public payer: Account,
+//   ) {
+//     this.connection = connection;
+//     this.tokenStreamAggrement = tokenStreamAggrement;
+//     this.tokenStreamAggrementA = tokenStreamAggrementA;
+//     this.tokenStreamAggrementB = tokenStreamAggrementB;
+//     this.userTransferAuthority = userTransferAuthority;
+//     this.authority = authority;
+//     this.userAccountA = userAccountA;
+//     this.userAccountB = userAccountB;
+//     this.swapProgramId = swapProgramId;
+//     this.tokenProgramId = tokenProgramId;
+//     this.payer = payer;
+//   }
+
+
+//   static async loadTokenStreamAggrement(
+//     connection: Connection,
+//     address: PublicKey,
+//     programId: PublicKey,
+//     payer: Account,
+//   ): Promise<TokenStreamAggrement> {
+//     const data = await loadAccount(connection, address, programId);
+//     const tokenStreamAggrementData = TokenStreamAggrementLayout.decode(data);
+//     console.log(" tokenStreamAggrementData ", tokenStreamAggrementData);
+//     if (!tokenStreamAggrementData.isInitialized) {
+//       throw new Error(`Invalid token swap state`);
+//     }
+
+//     const [authority] = await PublicKey.findProgramAddress(
+//       [address.toBuffer()],
+//       programId,
+//     );
+
+//     console.log(" tokenStreamAggrementData 1");
+//     const tokenStreamAggrement = new PublicKey(tokenStreamAggrementData.tokenStreamAggrement);
+//     const tokenStreamAggrementA = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementA);
+//     const tokenStreamAggrementB = new PublicKey(tokenStreamAggrementData.tokenStreamAggrementB);
+//     const userTransferAuthority = new PublicKey(tokenStreamAggrementData.userTransferAuthority);
+//     const userAccountA = new PublicKey(tokenStreamAggrementData.userAccountA);
+//     const userAccountB = new PublicKey(tokenStreamAggrementData.userAccountB);
+
+//     const tokenProgramId = new PublicKey(tokenStreamAggrementData.tokenProgramId);
+
+//     console.log(" tokenStreamAggrementData 3");
+
+
+//     return new TokenStreamAggrement(
+//       connection,
+//       tokenStreamAggrement,
+//       tokenStreamAggrementA,
+//       tokenStreamAggrementB,
+//       userTransferAuthority,
+//       authority,
+//       userAccountA,
+//       userAccountB,
+//       programId,
+//       tokenProgramId,
+//       payer,
+//     );
+//   }
+//   /**
+//    * Get the minimum balance for the token swap account to be rent exempt
+//    *
+//    * @return Number of lamports required
+//    */
+//   static async getMinBalanceRentForExemptTokenStreamAggrement(
+//     connection: Connection,
+//   ): Promise<number> {
+//     return await connection.getMinimumBalanceForRentExemption(
+//       TokenStreamAggrementLayout.span,
+//     );
+//   }
+
+//   static async getMinBalanceRentForExemptTokenStream(
+//     connection: Connection,
+//   ): Promise<number> {
+//     return await connection.getMinimumBalanceForRentExemption(
+//       TokenStreamLayout.span,
+//     );
+//   }
+//   static createInitStreamInstruction(
+//     tokenStreamAggrementAccount: Account,
+//     authority: PublicKey,
+//     userTransferAuthority: PublicKey,
+//     tokenStreamAggrementA: PublicKey,
+//     tokenStreamAggrementB: PublicKey,
+//     userAccountA: PublicKey,
+//     userAccountB: PublicKey,    tokenProgramId: PublicKey,
+//     swapProgramId: PublicKey,
+//   ): TransactionInstruction {
+//     const keys = [
+//       // {pubkey: swapProgramId, isSigner: false, isWritable: false},
+//       {pubkey: tokenStreamAggrementAccount.publicKey, isSigner: false, isWritable: true},
+//       {pubkey: authority, isSigner: false, isWritable: false},
+//       {pubkey: userTransferAuthority, isSigner: false, isWritable: false},
+//       {pubkey: userAccountA, isSigner: false, isWritable: false},
+//       {pubkey: tokenStreamAggrementA, isSigner: false, isWritable: false},
+//       {pubkey: userAccountB, isSigner: false, isWritable: false},
+//       {pubkey: tokenStreamAggrementB, isSigner: false, isWritable: false},
+//       {pubkey: tokenProgramId, isSigner: false, isWritable: false},
+//     ];
+//     const commandDataLayout = BufferLayout.struct([
+//       BufferLayout.u8('instruction'),
+//       BufferLayout.nu64('flowRate'),
+//     ]);
+//     // let data = Buffer.alloc(9);
+//     let data = Buffer.alloc(commandDataLayout.span);
+
+//     const flowRateNum = 12124380;
+
+//     {
+//       const encodeLength = commandDataLayout.encode(
+//         {
+//           instruction: 3, // InitializeSwap instruction
+//           // flowRate: new Numberu64(flowRateNum).toBuffer(),
+//           flowRate: new Numberu64(flowRateNum),
+//         },
+//         data,
+//       );
+//       data = data.slice(0, encodeLength);
+//     }
+//     return new TransactionInstruction({
+//       keys,
+//       programId: swapProgramId,
+//       data,
+//     });
+//   }
+
+
+//   /**
+//    * Create a new Token Swap
+//    *
+//    * @param connection The connection to use
+//    * @param payer Pays for the transaction
+//    * @param tokenStreamAggrementAccount The token swap account
+//    * @param authority The authority over the swap and accounts
+//    * @param nonce The nonce used to generate the authority
+//    * @param tokenAccountA: The token swap's Token A account
+//    * @param tokenAccountB: The token swap's Token B account
+//    * @param poolToken The pool token
+//    * @param tokenAccountPool The token swap's pool token account
+//    * @param tokenProgramId The program ID of the token program
+//    * @param swapProgramId The program ID of the token-swap program
+//    * @param feeNumerator Numerator of the fee ratio
+//    * @param feeDenominator Denominator of the fee ratio
+//    * @return Token object for the newly minted token, Public key of the account holding the total supply of new tokens
+//    */
+//   static async createTokenStreamAggrement(
+//     connection: Connection,
+//     payer: Account,
+//     tokenStreamAggrementAccount: Account,
+//     tokenStreamAggrementA: Account,
+//     tokenStreamAggrementB: Account,
+//     userTransferAuthority: Account,
+//     authority: PublicKey,
+//     userAccountA: Account,
+//     userAccountB: Account,
+//     swapProgramId: PublicKey,
+//     tokenProgramId: PublicKey,
+//   ): Promise<void> {
+//     console.log('In createTokenStreamAggrement');
+
+//     let transaction;
+//     // const tokenStreamAggrement = new TokenStreamAggrement(
+//     //   connection,
+//     //   tokenStreamAggrementAccount.publicKey,
+//     //   tokenStreamAggrementA.publicKey,
+//     //   tokenStreamAggrementB.publicKey,
+//     //   userTransferAuthority.publicKey,
+//     //   authority,
+//     //   userAccountA.publicKey,
+//     //   userAccountB.publicKey,
+//     //   swapProgramId,
+//     //   tokenProgramId,
+//     //   payer,
+//     // );
+
+//     // Allocate memory for the account
+//     const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStream(
+//       connection,
+//     );
+//     const balanceNeededAggrement = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
+//       connection,
+//     );
+ 
+//     console.log('In createTokenStreamAggrement balanceNeeded', balanceNeeded);
+//     transaction = new Transaction();
+//     transaction.add(
+//       SystemProgram.createAccount({
+//         fromPubkey: payer.publicKey,
+//         newAccountPubkey: tokenStreamAggrementA.publicKey,
+//         lamports: balanceNeededAggrement,
+//         space: TokenStreamAggrementLayout.span,
+//         programId: swapProgramId,
+//       }),
+//     );
+
+//     transaction.add(
+//       SystemProgram.createAccount({
+//         fromPubkey: payer.publicKey,
+//         newAccountPubkey: tokenStreamAggrementB.publicKey,
+//         lamports: balanceNeededAggrement,
+//         space: TokenStreamAggrementLayout.span,
+//         programId: swapProgramId,
+//       }),
+//     );
+//     // transaction.add(
+//     //   SystemProgram.createAccount({
+//     //     fromPubkey: payer.publicKey,
+//     //     newAccountPubkey: tokenStreamAggrementAccount.publicKey,
+//     //     lamports: balanceNeeded,
+//     //     space: TokenStreamLayout.span,
+//     //     programId: swapProgramId,
+//     //   }),
+//     // );
+
+//     const instruction = TokenStreamAggrement.createInitStreamInstruction(
+//       tokenStreamAggrementAccount,
+//       authority,
+//       userTransferAuthority.publicKey,
+//       tokenStreamAggrementA.publicKey,
+//       tokenStreamAggrementB.publicKey,
+//       userAccountA.publicKey,
+//       userAccountB.publicKey,
+//       tokenProgramId,
+//       swapProgramId,
+//     );
+
+//     console.log(" Gott INstructions");
+//     transaction.add(instruction);
+//     await sendAndConfirmTransaction(
+//       'createAccount and InitializeSwap',
+//       connection,
+//       transaction,
+//       this.payer,
+//       tokenStreamAggrementAccount,
+//       tokenStreamAggrementA,
+//       tokenStreamAggrementB
+//     );
+
+//     // return tokenStreamAggrement;
+//   }
+
+
+//     /**
+//    * Withdraw tokens from the pool
+//    *
+//    * @param userAccountA User account for token A
+//    * @param userAccountB User account for token B
+//    * @param poolAccount User account for pool token
+//    * @param userTransferAuthority Account delegated to transfer user's tokens
+//    * @param poolTokenAmount Amount of pool tokens to burn
+//    * @param minimumTokenA The minimum amount of token A to withdraw
+//    * @param minimumTokenB The minimum amount of token B to withdraw
+//    */
+//   // async startStreamTypes(
+//   //   // userAgggrementA: PublicKey,
+//   //   // userAgggrementB: PublicKey,
+//   //   userTransferAuthority: Account,
+//   //   flowRate: number | Numberu64,
+//   //   swapProgramId: PublicKey,
+//   //   payer: Signer,
+//   //   streamOwner: Account,
+//   // ): Promise<TransactionSignature> {
+//   //   let transaction;
+//   //   const userAgggrementA = Keypair.generate();
+//   //   const userAgggrementB = Keypair.generate();
+//   //   // Allocate memory for the account
+//   //   const balanceNeeded = await TokenStreamAggrement.getMinBalanceRentForExemptTokenStreamAggrement(
+//   //     this.connection,
+//   //   );
+
+//   //   console.log('creating token C');
+//   //   const mintC = await Token.createMint(
+//   //     this.connection,
+//   //     payer,
+//   //     streamOwner.publicKey,
+//   //     null,
+//   //     2,
+//   //     swapProgramId,
+//   //   );
+//   //   console.log("payer ", payer.publicKey);
+//   //   console.log("userAgggrementA ", userAgggrementA.publicKey);
+//   //   console.log("streamOwner ", streamOwner.publicKey);
+
+//   //   transaction = new Transaction();
+//   //   transaction.add(
+//   //     SystemProgram.createAccount({
+//   //       fromPubkey: payer.publicKey,
+//   //       newAccountPubkey: userAgggrementA.publicKey,
+//   //       lamports: balanceNeeded,
+//   //       space: TokenStreamAggrementLayout.span,
+//   //       programId: swapProgramId,
+//   //     }));
+
+
+//   //     console.log(" sending sendAndConfirmTransaction");
+    
+//   //   return await sendAndConfirmTransaction(
+//   //     'withdraw',
+//   //     this.connection,
+//   //     transaction,
+//   //     this.payer,
+//   //     userTransferAuthority,
+//   //   );
+//   // }
+
+//   // static startStreamTypesInstruction(
+//   //   tokenStreamAggrement: PublicKey,
+//   //   authority: PublicKey,
+//   //   userTransferAuthority: PublicKey,
+//   //   // poolMint: PublicKey,
+//   //   // feeAccount: PublicKey,
+//   //   // sourcePoolAccount: PublicKey,
+//   //   userAccountA: PublicKey,
+//   //   userAggrementA: PublicKey,
+//   //   userAccountB: PublicKey,
+//   //   userAggrementB: PublicKey,
+//   //   swapProgramId: PublicKey,
+//   //   tokenProgramId: PublicKey,
+//   //   flowRate: number | Numberu64,
+//   //   // minimumTokenA: number | Numberu64,
+//   //   // minimumTokenB: number | Numberu64,
+//   // ): TransactionInstruction {
+//   //   const dataLayout = BufferLayout.struct([
+//   //     BufferLayout.u8('instruction'),
+//   //     Layout.uint64('flowRate'),
+//   //     // Layout.uint64('minimumTokenA'),
+//   //     // Layout.uint64('minimumTokenB'),
+//   //   ]);
+
+//   //   const data = Buffer.alloc(dataLayout.span);
+//   //   dataLayout.encode(
+//   //     {
+//   //       instruction: 3, // Withdraw instruction
+//   //       flowRate: new Numberu64(flowRate).toBuffer(),
+//   //       // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
+//   //       // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
+//   //     },
+//   //     data,
+//   //   );
+
+//   //   const keys = [
+//   //     {pubkey: tokenStreamAggrement, isSigner: false, isWritable: false},
+//   //     {pubkey: authority, isSigner: false, isWritable: false},
+//   //     {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
+//   //     {pubkey: userAccountA, isSigner: false, isWritable: true},
+//   //     {pubkey: userAggrementA, isSigner: false, isWritable: true},
+//   //     {pubkey: userAccountB, isSigner: false, isWritable: true},
+//   //     {pubkey: userAggrementB, isSigner: false, isWritable: true},
+//   //     {pubkey: tokenProgramId, isSigner: false, isWritable: false},
+//   //   ];
+//   //   console.log("keys", keys);
+//   //   console.log("data", data);
+    
+//   //   return new TransactionInstruction({
+//   //     keys,
+//   //     programId: swapProgramId,
+//   //     data,
+//   //   });
+//   // }
+
+
+
+//       /**
+//    * Withdraw tokens from the pool
+//    *
+//    * @param userAccountA User account for token A
+//    * @param userAccountB User account for token B
+//    * @param poolAccount User account for pool token
+//    * @param userTransferAuthority Account delegated to transfer user's tokens
+//    * @param flowRate Amount of pool tokens to burn
+//    * @param minimumTokenA The minimum amount of token A to withdraw
+//    * @param minimumTokenB The minimum amount of token B to withdraw
+//    */
+//   // async stopStreamTypes(
+//   //   userAgggrementA: PublicKey,
+//   //   userAgggrementB: PublicKey,
+//   //   userTransferAuthority: Account,
+//   //   flowRate: number | Numberu64,
+//   //   swapProgramId: PublicKey,
+//   // ): Promise<TransactionSignature> {
+
+  
+//   //   return await sendAndConfirmTransaction(
+//   //     'withdraw',
+//   //     this.connection,
+//   //     new Transaction().add(
+//   //       TokenStreamAggrement.stoptreamTypesInstruction(
+//   //         this.tokenStreamAggrement,
+//   //         this.authority,
+//   //         userTransferAuthority.publicKey,
+//   //         // this.poolToken,
+//   //         // this.feeAccount,
+//   //         // poolAccount,
+//   //         this.tokenAccountA,
+//   //         userAgggrementA,
+//   //         this.tokenAccountB,
+//   //         userAgggrementB,
+//   //         // userAgggrementA,
+//   //         // userAgggrementB,
+//   //         this.swapProgramId,
+//   //         this.tokenProgramId,
+//   //         flowRate,
+//   //         // minimumTokenA,
+//   //         // minimumTokenB,
+//   //       ),
+//   //     ),
+//   //     this.payer,
+//   //     userTransferAuthority,
+//   //   );
+//   // }
+
+//   // static stoptreamTypesInstruction(
+//   //   tokenStreamAggrement: PublicKey,
+//   //   authority: PublicKey,
+//   //   userTransferAuthority: PublicKey,
+//   //   // poolMint: PublicKey,
+//   //   // feeAccount: PublicKey,
+//   //   // sourcePoolAccount: PublicKey,
+//   //   userAccountA: PublicKey,
+//   //   userAggrementA: PublicKey,
+//   //   userAccountB: PublicKey,
+//   //   userAggrementB: PublicKey,
+//   //   swapProgramId: PublicKey,
+//   //   tokenProgramId: PublicKey,
+//   //   flowRate: number | Numberu64,
+//   //   // minimumTokenA: number | Numberu64,
+//   //   // minimumTokenB: number | Numberu64,
+//   // ): TransactionInstruction {
+//   //   const dataLayout = BufferLayout.struct([
+//   //     BufferLayout.u8('instruction'),
+//   //     Layout.uint64('flowRate'),
+//   //     // Layout.uint64('minimumTokenA'),
+//   //     // Layout.uint64('minimumTokenB'),
+//   //   ]);
+
+//   //   const data = Buffer.alloc(dataLayout.span);
+//   //   dataLayout.encode(
+//   //     {
+//   //       instruction: 2, // Withdraw instruction
+//   //       flowRate: new Numberu64(flowRate).toBuffer(),
+//   //       // minimumTokenA: new Numberu64(minimumTokenA).toBuffer(),
+//   //       // minimumTokenB: new Numberu64(minimumTokenB).toBuffer(),
+//   //     },
+//   //     data,
+//   //   );
+
+//   //   const keys = [
+//   //     {pubkey: tokenStreamAggrement, isSigner: false, isWritable: false},
+//   //     {pubkey: authority, isSigner: false, isWritable: false},
+//   //     {pubkey: userTransferAuthority, isSigner: true, isWritable: false},
+//   //     {pubkey: userAccountA, isSigner: false, isWritable: true},
+//   //     {pubkey: userAggrementA, isSigner: false, isWritable: true},
+//   //     {pubkey: userAccountB, isSigner: false, isWritable: true},
+//   //     {pubkey: userAggrementB, isSigner: false, isWritable: true},
+//   //     {pubkey: tokenProgramId, isSigner: false, isWritable: false},
+//   //   ];
+//   //   return new TransactionInstruction({
+//   //     keys,
+//   //     programId: swapProgramId,
+//   //     data,
+//   //   });
+//   // }
+// }

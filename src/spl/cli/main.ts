@@ -1,5 +1,5 @@
 import {
-  createAccountAndSwapAtomic,
+  // createAccountAndSwapAtomic,
   createTokenStreamAggrement,
   createTokenSwap,
   startStreaming,
@@ -37,8 +37,8 @@ async function main() {
   await withdrawAllTokenTypes();
   console.log('****************************************');
   await createTokenStreamAggrement();
-  console.log('Run test: Start & Stop Streaming');
-  console.log('****************************************');
+  // console.log('Run test: Start & Stop Streaming');
+  // console.log('****************************************');
   // await startStreaming();
   // console.log('****************************************');
   // console.log('Run test: create account, approve, swap all at once');

@@ -8,13 +8,14 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 
-import {TokenSwap, TokenStreamAggrement, CurveType, TOKEN_SWAP_PROGRAM_ID} from '../src';
+import {TokenSwap, CurveType, TOKEN_SWAP_PROGRAM_ID} from '../src';
 import {sendAndConfirmTransaction} from '../src/util/send-and-confirm-transaction';
 import {newAccountWithLamports} from '../src/util/new-account-with-lamports';
 import {url} from '../src/util/url';
 import {sleep} from '../src/util/sleep';
 import {Numberu64} from '../dist';
 
+// TokenStreamAggrement
 // The following globals are created by `createTokenSwap` and used by subsequent tests
 // Token swap
 let tokenSwap: TokenSwap;
@@ -34,8 +35,9 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 let userAccountA: PublicKey;
+let userAccountB: PublicKey;
 
-let tokenStreamAggrement: TokenStreamAggrement;
+// let tokenStreamAggrement: TokenStreamAggrement;
 
 // Hard-coded fee address, for testing production mode
 const SWAP_PROGRAM_OWNER_FEE_ADDRESS =
@@ -232,8 +234,6 @@ export async function createTokenStreamAggrement(): Promise<void> {
   const tokenStreamAggrementAccount = new Account();
   const tokenStreamAggrementA = new Account();
   const tokenStreamAggrementB = new Account();
-  const userAccountA = new Account();
-  const userAccountB = new Account();
   const userTransferAuthority = new Account();
 
   [authority, nonce] = await PublicKey.findProgramAddress(
@@ -243,7 +243,7 @@ export async function createTokenStreamAggrement(): Promise<void> {
 
   console.log('creating token stream aggrement ***');
   const streamPayer = await newAccountWithLamports(connection, 10000000000);
-  tokenStreamAggrement = await TokenStreamAggrement.createTokenStreamAggrement(
+   await tokenSwap.createTokenStreamAggrement(
     connection,
     streamPayer,
     tokenStreamAggrementAccount,
@@ -257,13 +257,13 @@ export async function createTokenStreamAggrement(): Promise<void> {
     TOKEN_PROGRAM_ID,
   );
 
-  console.log('loading token stream aggrement');
-  const fetchedTokenStreamAggrement = await TokenStreamAggrement.loadTokenStreamAggrement(
-    connection,
-    tokenStreamAggrementAccount.publicKey,
-    TOKEN_SWAP_PROGRAM_ID,
-    streamPayer,
-  );
+  // console.log('loading token stream aggrement');
+  // const fetchedTokenStreamAggrement = await TokenStreamAggrement.loadTokenStreamAggrement(
+  //   connection,
+  //   tokenStreamAggrementAccount.publicKey,
+  //   TOKEN_SWAP_PROGRAM_ID,
+  //   streamPayer,
+  // );
 
 }
 
@@ -291,7 +291,7 @@ export async function depositAllTokenTypes(): Promise<void> {
     tokenA,
   );
   console.log('Creating depositor token b account');
-  const userAccountB = await mintB.createAccount(owner.publicKey);
+  userAccountB = await mintB.createAccount(owner.publicKey);
   await mintB.mintTo(userAccountB, owner, [], tokenB);
   await mintB.approve(
     userAccountB,
@@ -331,84 +331,84 @@ export async function depositAllTokenTypes(): Promise<void> {
 }
 
 
-export async function createAccountAndSwapAtomic(): Promise<void> {
-  console.log('Creating swap token a account');
-  let userAccountA = await mintA.createAccount(owner.publicKey);
-  await mintA.mintTo(userAccountA, owner, [], SWAP_AMOUNT_IN);
+// export async function createAccountAndSwapAtomic(): Promise<void> {
+//   console.log('Creating swap token a account');
+//   let userAccountA = await mintA.createAccount(owner.publicKey);
+//   await mintA.mintTo(userAccountA, owner, [], SWAP_AMOUNT_IN);
 
-  // @ts-ignore
-  const balanceNeeded = await Token.getMinBalanceRentForExemptAccount(
-    connection,
-  );
-  const newAccount = new Account();
-  const transaction = new Transaction();
-  transaction.add(
-    SystemProgram.createAccount({
-      fromPubkey: owner.publicKey,
-      newAccountPubkey: newAccount.publicKey,
-      lamports: balanceNeeded,
-      space: AccountLayout.span,
-      programId: mintB.programId,
-    }),
-  );
+//   // @ts-ignore
+//   const balanceNeeded = await Token.getMinBalanceRentForExemptAccount(
+//     connection,
+//   );
+//   const newAccount = new Account();
+//   const transaction = new Transaction();
+//   transaction.add(
+//     SystemProgram.createAccount({
+//       fromPubkey: owner.publicKey,
+//       newAccountPubkey: newAccount.publicKey,
+//       lamports: balanceNeeded,
+//       space: AccountLayout.span,
+//       programId: mintB.programId,
+//     }),
+//   );
 
-  transaction.add(
-    Token.createInitAccountInstruction(
-      mintB.programId,
-      mintB.publicKey,
-      newAccount.publicKey,
-      owner.publicKey,
-    ),
-  );
+//   transaction.add(
+//     Token.createInitAccountInstruction(
+//       mintB.programId,
+//       mintB.publicKey,
+//       newAccount.publicKey,
+//       owner.publicKey,
+//     ),
+//   );
 
-  const userTransferAuthority = new Account();
-  transaction.add(
-    Token.createApproveInstruction(
-      mintA.programId,
-      userAccountA,
-      userTransferAuthority.publicKey,
-      owner.publicKey,
-      [owner],
-      SWAP_AMOUNT_IN,
-    ),
-  );
+//   const userTransferAuthority = new Account();
+//   transaction.add(
+//     Token.createApproveInstruction(
+//       mintA.programId,
+//       userAccountA,
+//       userTransferAuthority.publicKey,
+//       owner.publicKey,
+//       [owner],
+//       SWAP_AMOUNT_IN,
+//     ),
+//   );
 
-  transaction.add(
-    TokenSwap.swapInstruction(
-      tokenSwap.tokenSwap,
-      tokenSwap.authority,
-      userTransferAuthority.publicKey,
-      userAccountA,
-      tokenSwap.tokenAccountA,
-      tokenSwap.tokenAccountB,
-      newAccount.publicKey,
-      tokenSwap.poolToken,
-      tokenSwap.feeAccount,
-      null,
-      tokenSwap.swapProgramId,
-      tokenSwap.tokenProgramId,
-      SWAP_AMOUNT_IN,
-      0,
-    ),
-  );
+//   transaction.add(
+//     TokenSwap.swapInstruction(
+//       tokenSwap.tokenSwap,
+//       tokenSwap.authority,
+//       userTransferAuthority.publicKey,
+//       userAccountA,
+//       tokenSwap.tokenAccountA,
+//       tokenSwap.tokenAccountB,
+//       newAccount.publicKey,
+//       tokenSwap.poolToken,
+//       tokenSwap.feeAccount,
+//       null,
+//       tokenSwap.swapProgramId,
+//       tokenSwap.tokenProgramId,
+//       SWAP_AMOUNT_IN,
+//       0,
+//     ),
+//   );
 
-  // Send the instructions
-  console.log('sending big instruction');
-  await sendAndConfirmTransaction(
-    'create account, approve transfer, swap',
-    connection,
-    transaction,
-    owner,
-    newAccount,
-    userTransferAuthority,
-  );
+//   // Send the instructions
+//   console.log('sending big instruction');
+//   await sendAndConfirmTransaction(
+//     'create account, approve transfer, swap',
+//     connection,
+//     transaction,
+//     owner,
+//     newAccount,
+//     userTransferAuthority,
+//   );
 
-  let info;
-  info = await mintA.getAccountInfo(tokenAccountA);
-  currentSwapTokenA = info.amount.toNumber();
-  info = await mintB.getAccountInfo(tokenAccountB);
-  currentSwapTokenB = info.amount.toNumber();
-}
+//   let info;
+//   info = await mintA.getAccountInfo(tokenAccountA);
+//   currentSwapTokenA = info.amount.toNumber();
+//   info = await mintB.getAccountInfo(tokenAccountB);
+//   currentSwapTokenB = info.amount.toNumber();
+// }
 export async function withdrawAllTokenTypes(): Promise<void> {
   const poolMintInfo = await tokenPool.getMintInfo();
   const supply = poolMintInfo.supply.toNumber();
@@ -455,26 +455,6 @@ export async function withdrawAllTokenTypes(): Promise<void> {
     tokenB,
   );
 
-  // //const poolMintInfo = await tokenPool.getMintInfo();
-  // swapTokenA = await mintA.getAccountInfo(tokenAccountA);
-  // swapTokenB = await mintB.getAccountInfo(tokenAccountB);
-
-  // let info = await tokenPool.getAccountInfo(tokenAccountPool);
-  // // assert(
-  // //   info.amount.toNumber() == DEFAULT_POOL_TOKEN_AMOUNT - POOL_TOKEN_AMOUNT,
-  // // );
-  // // assert(swapTokenA.amount.toNumber() == currentSwapTokenA - tokenA);
-  // currentSwapTokenA -= tokenA;
-  // // assert(swapTokenB.amount.toNumber() == currentSwapTokenB - tokenB);
-  // // currentSwapTokenB -= tokenB;
-  // info = await mintA.getAccountInfo(userAccountA);
-  // console.log(" info ", info);
-  // // assert(info.amount.toNumber() == tokenA);
-  // // info = await mintB.getAccountInfo(userAccountB);
-  // // assert(info.amount.toNumber() == tokenB);
-  // info = await tokenPool.getAccountInfo(feeAccount);
-  // // assert(info.amount.toNumber() == feeAmount);
-  // currentFeeAmount = feeAmount;
 }
 
 
