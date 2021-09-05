@@ -3,4 +3,4 @@ export { FaucetView } from "./faucet";
 export { DepositView } from "./deposit";
 export { WithdrawView } from "./withdraw";
 export { InitializeView } from "./initialize";
-export { SttreamView } from "./stream";
+export { StreamView } from "./stream";

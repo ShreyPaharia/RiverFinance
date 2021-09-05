@@ -21,7 +21,7 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
-  depositAllTokenTypes,
+  depositAllTokenTypesUI,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
@@ -50,7 +50,7 @@ export const DepositView = () => {
   const { publicKey } = useWallet();
 
   const handleRequest = async () => {
-    await depositAllTokenTypes();
+    await depositAllTokenTypesUI(publicKey, amount);
   };
 
   const [streamList, setStreamList] = useState([{key:"DAI", value:"DAI"}]);

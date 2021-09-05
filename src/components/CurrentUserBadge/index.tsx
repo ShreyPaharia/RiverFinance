@@ -17,15 +17,15 @@ export const CurrentUserBadge = () => {
 
   return (
     <div className="wallet-wrapper">
+        <Identicon
+          address={publicKey.toBase58()}
+          style={{ display: "flex" }}
+        />
       <span>
         {formatNumber.format((account?.lamports || 0) / LAMPORTS_PER_SOL)} SOL
       </span>
       <div className="wallet-key">
         {shortenAddress(`${publicKey}`)}
-        <Identicon
-          address={publicKey.toBase58()}
-          style={{ marginLeft: "0.5rem", display: "flex" }}
-        />
       </div>
     </div>
   );

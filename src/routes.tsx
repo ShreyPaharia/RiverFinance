@@ -5,7 +5,7 @@ import { ConnectionProvider } from "./contexts/connection";
 import { AccountsProvider } from "./contexts/accounts";
 import { MarketProvider } from "./contexts/market";
 import { AppLayout } from "./components/Layout";
-import { FaucetView, HomeView, InitializeView, DepositView, WithdrawView, SttreamView } from "./views";
+import { FaucetView, HomeView, InitializeView, DepositView, WithdrawView, StreamView  } from "./views";
 import {
   getLedgerWallet,
   getMathWallet,
@@ -122,7 +122,7 @@ export function Routes() {
                   <Route exact path="/initialize" children={<InitializeView />} />
                   <Route exact path="/deposit" children={<DepositView />} />
                   <Route exact path="/withdraw" children={<WithdrawView />} />
-                  <Route exact path="/stream" children={<SttreamView />} />
+                  <Route exact path="/stream" children={<StreamView  />} />
                 </Switch>
                       </Content>
                       </Layout>

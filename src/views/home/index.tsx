@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "antd";
 import {  Input,  Menu, Dropdown } from "antd";
@@ -21,11 +21,12 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
-  depositAllTokenTypes,
+  depositAllTokenTypesUI,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
 import { DownOutlined, UserOutlined, InboxOutlined } from '@ant-design/icons';
+import { useUserAccounts } from "../../hooks";
 
 
 let tokenStream;
@@ -49,13 +50,11 @@ export const HomeView = () => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
-  const handleRequest = async () => {
-    await depositAllTokenTypes();
-  };
-
   const [streamList, setStreamList] = useState([]);
   const [stream, setStream] = useState("Select stream type");
   const [amount, setAmount] = useState("");
+  const [accounts, setAccounts] = useState([]);
+  const { userAccounts } = useUserAccounts();
 
 
 const streamMenus = (
@@ -71,6 +70,11 @@ const streamMenus = (
       ))}
     </Menu>
   );
+
+  const handleRequest = async () => {
+    await depositAllTokenTypesUI(publicKey, amount);
+  };
+
 
   return (
     <div className="flexColumn" style={{ flex: 1 }}>

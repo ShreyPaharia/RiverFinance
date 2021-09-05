@@ -53,7 +53,8 @@ export const WalletView = () => {
       <Col span={24}>
       <div style={{ margin: '24px 0' }} />
       <div>
-          SOL: {SOL.balance} ({formatUSD.format(SOL.balanceInUSD)})
+          <TokenIcon mintAddress={DAI_ADDRESS} /> SOL: {SOL?.balance?.toFixed(2)} (
+          {formatUSD.format(SOL?.balanceInUSD)})
         </div>
       </Col>
       <Col span={24}>

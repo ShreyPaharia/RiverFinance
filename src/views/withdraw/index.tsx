@@ -37,7 +37,7 @@ export const WithdrawView = () => {
   const [amount, setAmount] = useState("");
 
   const handleRequest = async () => {
-    await withdrawAllTokenTypesUI(amount);
+    await withdrawAllTokenTypesUI(publicKey, amount);
   };
 
 const streamMenus = (

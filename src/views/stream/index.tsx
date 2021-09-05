@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "antd";
-import {  Input,  Menu, Dropdown } from "antd";
+import {  Input,  Menu, Dropdown, Divider } from "antd";
 
 import { useConnection } from "../../contexts/connection";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -21,11 +21,11 @@ import {
 } from '@solana/web3.js';
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
-  depositAllTokenTypes,
+  depositAllTokenTypesUI,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
-import { DownOutlined, UserOutlined, InboxOutlined } from '@ant-design/icons';
+import { DownOutlined, MoneyCollectOutlined, InboxOutlined } from '@ant-design/icons';
 
 
 let tokenStream;
@@ -45,39 +45,44 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 
-export const SttreamView = () => {
+export const StreamView = () => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
   const handleRequest = async () => {
-    await depositAllTokenTypes();
+    await depositAllTokenTypesUI(publicKey, amount);
   };
 
-  const [streamList, setStreamList] = useState([]);
-  const [stream, setStream] = useState("Select stream type");
-  const [amount, setAmount] = useState("");
+  const [flowRate, setFlowRate] = useState(1222);
+  const [receiverAddr, setReceiverAddr] = useState();
 
-
-const streamMenus = (
-    <Menu onClick={e => {
-      // console.log(" in anchorMenu", e);
-      // @ts-ignore.
-      const newSelected = streamList && streamList.find(item => item.key === e.key);
-      console.log("newSelected", newSelected && newSelected.key);
-      setStream(newSelected && newSelected.value);
-    }}>
-      {streamList && streamList.map(item => (
-        <Menu.Item key={item.key}  icon={<UserOutlined />}>{item.value}</Menu.Item>
-      ))}
-    </Menu>
-  );
 
   return (
     <div className="flexColumn" style={{ flex: 1 }}>
       <div>
         <div className="deposit-input-title" style={{ margin: 10 }}>
         <div style={{ margin: '24px 0' }} />
-            <Button onClick={handleRequest}>Initialize</Button>
+        <Input addonBefore="$"
+              style={{ width: 200  }}
+              placeholder="Recipient Address"
+              autoComplete="off"
+              onChange={e => {
+                setReceiverAddr(e.target.value);
+              }}
+            />
+
+          <div style={{ margin: '24px 0'}} />
+          <Input addonBefore="$"
+              style={{ width: 200  }}
+              placeholder="Flow rate"
+              autoComplete="off"
+              onChange={e => {
+                setFlowRate(e.target.value);
+              }}
+            />
+
+        <div style={{ margin: '24px 0' }} />
+            <Button onClick={handleRequest}>Deposit</Button>
           </div>
       </div>
     </div>
