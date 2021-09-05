@@ -1303,7 +1303,7 @@ export class TokenSwap {
 
     const instruction = TokenSwap.createInitStreamInstruction(
       this.tokenSwap,
-      authority,
+      this.authority,
       userTransferAuthority.publicKey,
       tokenStreamAggrementA.publicKey,
       tokenStreamAggrementB.publicKey,

@@ -7,7 +7,7 @@ import {
   withdrawAllTokenTypes,
   depositSingleTokenTypeExactAmountIn,
   withdrawSingleTokenTypeExactAmountOut,
-} from './token-swap-test';
+} from './tokenStreanFacade';
 import {CurveType, Numberu64} from '../dist';
 
 async function main() {
