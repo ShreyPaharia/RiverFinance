@@ -418,6 +418,11 @@ export async function depositAllTokenTypesUI(senderAccount: PublicKey, receiverA
 //   currentSwapTokenB = info.amount.toNumber();
 // }
 export async function withdrawAllTokenTypes(): Promise<void> {
+
+  withdrawAllTokenTypesUI(POOL_TOKEN_AMOUNT)
+}
+
+export async function withdrawAllTokenTypesUI(POOL_TOKEN_AMOUNT2: number): Promise<void> {
   const poolMintInfo = await tokenPool.getMintInfo();
   const supply = poolMintInfo.supply.toNumber();
   let swapTokenA = await mintA.getAccountInfo(tokenAccountA);

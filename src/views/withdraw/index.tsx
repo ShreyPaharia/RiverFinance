@@ -21,9 +21,9 @@ import {
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import { CurveType, Numberu64 } from '../../util/utils';
 import {
-  withdrawAllTokenTypes,
+  withdrawAllTokenTypesUI,
 } from '../../spl/cli/tokenStreanFacade';
-import { DownOutlined, UserOutlined, InboxOutlined } from '@ant-design/icons';
+import { DownOutlined, MoneyCollectOutlined , InboxOutlined } from '@ant-design/icons';
 
 
 
@@ -31,14 +31,14 @@ export const WithdrawView = () => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
-  const handleRequest = async () => {
-    await withdrawAllTokenTypes();
-  };
 
-  const [streamList, setStreamList] = useState([]);
-  const [stream, setStream] = useState("Select stream type");
+  const [streamList, setStreamList] = useState([{key:"DAI", value:"DAI"}]);
+  const [stream, setStream] = useState("Select Token");
   const [amount, setAmount] = useState("");
 
+  const handleRequest = async () => {
+    await withdrawAllTokenTypesUI(amount);
+  };
 
 const streamMenus = (
     <Menu onClick={e => {
@@ -49,48 +49,38 @@ const streamMenus = (
       setStream(newSelected && newSelected.value);
     }}>
       {streamList && streamList.map(item => (
-        <Menu.Item key={item.key}  icon={<UserOutlined />}>{item.value}</Menu.Item>
+        <Menu.Item key={item.key}  icon={<MoneyCollectOutlined  />}>{item.value}</Menu.Item>
       ))}
     </Menu>
   );
 
 
   return (
-    <div className="flexColumn" style={{ flex: 1 }}>
+      <div className="flexColumn" style={{ flex: 1 }}>
       <div>
         <div className="deposit-input-title" style={{ margin: 10 }}>
-        {/* {TOKEN_STREAM_PROGRAM_ID} */}
-        {/* {console.log("TOKEN_STREAM_PROGRAM_ID", TOKEN_STREAM_PROGRAM_ID)} */}
-
-        <div  style={{ margin: 8 }} ></div>
-        <Col span={8}>
-
+        <div style={{ margin: '24px 0' }} />
           <Dropdown overlay={streamMenus}>
             <Button>
               {stream} <DownOutlined />
             </Button>
           </Dropdown>
-          </Col>
 
-          <Col span={8}>
-          <div  style={{ margin: 8 }}></div>
+          <div style={{ margin: '24px 0'}} />
           <Input addonBefore="$"
               placeholder="Amount"
               autoComplete="off"
+              style={{ width: 200  }}
               onChange={e => {
                 setAmount(e.target.value);
               }}
             />
-            </Col>
 
-            <div  style={{ margin: 8 }}></div>
-          <Col span={8}>
-          <Button onClick={handleRequest}>Withdraw</Button>
-          </Col>
+        <div style={{ margin: '24px 0' }} />
+            <Button onClick={handleRequest}>Withdraw</Button>
           </div>
-
-
       </div>
-    </div>
+      </div>
+
   );
 };

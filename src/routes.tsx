@@ -5,7 +5,7 @@ import { ConnectionProvider } from "./contexts/connection";
 import { AccountsProvider } from "./contexts/accounts";
 import { MarketProvider } from "./contexts/market";
 import { AppLayout } from "./components/Layout";
-import { FaucetView, HomeView, InitializeView, DepositView, WithdrawView } from "./views";
+import { FaucetView, HomeView, InitializeView, DepositView, WithdrawView, SttreamView } from "./views";
 import {
   getLedgerWallet,
   getMathWallet,
@@ -16,9 +16,11 @@ import {
   getTorusWallet,
 } from "@solana/wallet-adapter-wallets";
 import { Layout, Menu, Breadcrumb, Row } from 'antd';
-import { HomeTwoTone, PlusSquareTwoTone, MinusSquareTwoTone } from '@ant-design/icons';
+import { HomeTwoTone, PlusSquareTwoTone, MinusSquareTwoTone, SyncOutlined } from '@ant-design/icons';
 import {  WalletView } from "./views/wallet"
 import { fromLamports } from "./utils/utils";
+import { Spin, Space } from 'antd';
+
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
@@ -41,7 +43,7 @@ export function Routes() {
     ],
     []
   );
-  const [route, setRoute] = useState("/");
+  const [isLoading, setLoading] = useState(false);
   return (
     <HashRouter basename={"/"}>
       <ConnectionProvider>
@@ -54,7 +56,6 @@ export function Routes() {
                   <Layout>
                     <Sider width={200} className="site-layout-background">
                       <Menu
-                        selectedKeys={[route]} 
                         mode="inline"
                         defaultSelectedKeys={['1']}
                         defaultOpenKeys={['sub1']}
@@ -77,14 +78,19 @@ export function Routes() {
                             <Link to="/withdraw">
                             Withdraw
                             </Link>
+                            </Menu.Item>
+                          <Menu.Item key="3" icon={<SyncOutlined spin/>} >
+                            {/* <Link onClick={() => { setRoute("/withdraw");}} to="/withdraw"> */}
+                            <Link to="/stream">
+                            Stream
+                            </Link>
                           </Menu.Item>
                       </Menu>
                       <Menu
                         mode="inline"
                         defaultSelectedKeys={['1']}
                         defaultOpenKeys={['sub1']}
-                        style={{ height: '30%', borderRight: 0, padding: 20, }}
-                      >
+                        style={{ height: '30%', borderRight: 0, padding: 20}}>
                       <WalletView></WalletView>
                       </Menu>
                     </Sider>
@@ -94,23 +100,32 @@ export function Routes() {
                         <Breadcrumb.Item>List</Breadcrumb.Item>
                         <Breadcrumb.Item>App</Breadcrumb.Item>
                       </Breadcrumb>
+                      <Layout style={{ padding: '0 24px 24px' }}>
                       <Content
-                        className="site-layout-background"
+                        className="site-layout-background2"
                         style={{
                           // align-items: center,
                           padding: 24,
                           margin: 0,
                           minHeight: 280,
+                          display: "flex", justifyContent: "center"
                         }}
                       >
+                         <Space size="large" align="center" >
+                          <Spin size="small" spinning={isLoading}/>
+                          <Spin spinning={isLoading}/>
+                          <Spin size="large" spinning={isLoading}/>
+                        </Space>
                 <Switch>
                   <Route exact path="/" component={() => <HomeView />} />
                   <Route exact path="/faucet" children={<FaucetView />} />
                   <Route exact path="/initialize" children={<InitializeView />} />
                   <Route exact path="/deposit" children={<DepositView />} />
                   <Route exact path="/withdraw" children={<WithdrawView />} />
+                  <Route exact path="/stream" children={<SttreamView />} />
                 </Switch>
                       </Content>
+                      </Layout>
                     </Layout>
                   </Layout>
                 </Layout>,

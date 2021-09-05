@@ -15,8 +15,12 @@ import {
 export const WalletView = () => {
   const { marketEmitter, midPriceInUSD } = useMarkets();
   const { tokenMap } = useConnectionConfig();
-  const SRM_ADDRESS = "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt";
-  const SRM = useUserBalance(SRM_ADDRESS);
+  // const SRM_ADDRESS = "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt";
+  // const SRM = useUserBalance(SRM_ADDRESS);
+  const DAI_ADDRESS = "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt";
+  const DAI = useUserBalance(DAI_ADDRESS);
+  const DAIR_ADDRESS = "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt";
+  const DAIR = useUserBalance(DAIR_ADDRESS);
   const SOL = useUserBalance(WRAPPED_SOL_MINT);
   const { balanceInUSD: totalBalanceInUSD } = useUserTotalBalance();
 
@@ -42,7 +46,7 @@ export const WalletView = () => {
   return (
     <Row gutter={[16, 16]} align="middle">
       <Col span={24}>
-      <div style={{ margin: '24px 0' }} />
+      <div style={{ margin: '24px 0',  }} />
         <div>Your balances ({formatUSD.format(totalBalanceInUSD)}):</div>
       </Col>
 
@@ -54,9 +58,13 @@ export const WalletView = () => {
       </Col>
       <Col span={24}>
       <div style={{ margin: '24px 0' }} />
-      <div style={{ display: "inline-flex", alignItems: "center" }}>
-          <TokenIcon mintAddress={SRM_ADDRESS} /> SRM: {SRM?.balance} (
-          {formatUSD.format(SRM?.balanceInUSD)})
+      <div style={{ display: "inline-flex", alignItems: "center", marginBottom: 25 }}>
+          <TokenIcon mintAddress={DAI_ADDRESS} /> DAI: {DAI?.balance} (
+          {formatUSD.format(DAI?.balanceInUSD)})
+        </div>
+        <div style={{ display: "inline-flex", alignItems: "center" }}>
+          <TokenIcon mintAddress={DAIR_ADDRESS} /> DAIR: {DAIR?.balance} (
+          {formatUSD.format(DAIR?.balanceInUSD)})
         </div>
       </Col>
     </Row>

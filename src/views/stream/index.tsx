@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "antd";
-import {  Input,  Menu, Dropdown, Divider } from "antd";
+import {  Input,  Menu, Dropdown } from "antd";
 
 import { useConnection } from "../../contexts/connection";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -25,7 +25,7 @@ import {
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
-import { DownOutlined, MoneyCollectOutlined, InboxOutlined } from '@ant-design/icons';
+import { DownOutlined, UserOutlined, InboxOutlined } from '@ant-design/icons';
 
 
 let tokenStream;
@@ -45,7 +45,7 @@ let mintB: Token;
 let tokenAccountA: PublicKey;
 let tokenAccountB: PublicKey;
 
-export const DepositView = () => {
+export const SttreamView = () => {
   const connection = useConnection();
   const { publicKey } = useWallet();
 
@@ -53,8 +53,8 @@ export const DepositView = () => {
     await depositAllTokenTypes();
   };
 
-  const [streamList, setStreamList] = useState([{key:"DAI", value:"DAI"}]);
-  const [stream, setStream] = useState("Select Token");
+  const [streamList, setStreamList] = useState([]);
+  const [stream, setStream] = useState("Select stream type");
   const [amount, setAmount] = useState("");
 
 
@@ -67,7 +67,7 @@ const streamMenus = (
       setStream(newSelected && newSelected.value);
     }}>
       {streamList && streamList.map(item => (
-        <Menu.Item key={item.key}  icon={<MoneyCollectOutlined />}>{item.value}</Menu.Item>
+        <Menu.Item key={item.key}  icon={<UserOutlined />}>{item.value}</Menu.Item>
       ))}
     </Menu>
   );
@@ -77,24 +77,7 @@ const streamMenus = (
       <div>
         <div className="deposit-input-title" style={{ margin: 10 }}>
         <div style={{ margin: '24px 0' }} />
-          <Dropdown overlay={streamMenus}>
-            <Button>
-              {stream} <DownOutlined />
-            </Button>
-          </Dropdown>
-
-          <div style={{ margin: '24px 0'}} />
-          <Input addonBefore="$"
-              style={{ width: 200  }}
-              placeholder="Amount"
-              autoComplete="off"
-              onChange={e => {
-                setAmount(e.target.value);
-              }}
-            />
-
-        <div style={{ margin: '24px 0' }} />
-            <Button onClick={handleRequest}>Deposit</Button>
+            <Button onClick={handleRequest}>Initialize</Button>
           </div>
       </div>
     </div>

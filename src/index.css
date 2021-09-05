@@ -24,3 +24,8 @@ code {
   background-repeat: no-repeat;
   margin: 0 auto 0 auto;
 }
+
+/* .flexColumn {
+  align-self: center !important;
+  text-align: center !important;
+} */
