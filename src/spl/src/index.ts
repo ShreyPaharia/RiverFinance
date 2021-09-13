@@ -72,12 +72,16 @@ export const TokenSwapLayout = BufferLayout.struct([
   BufferLayout.u8('nonce'),
   Layout.publicKey('tokenProgramId'),
   Layout.publicKey('tokenAccountA'),
-  Layout.publicKey('tokenAccountB'),
+  Layout.publicKey('tokenSwap'),
   Layout.publicKey('tokenPool'),
   Layout.publicKey('mintA'),
-  Layout.publicKey('mintB'),
+  Layout.publicKey('authority'),
   Layout.publicKey('feeAccount'),
 ]);
+
+// this.tokenSwap = tokenSwap;
+// this.authority = authority;
+
 
 export const TokenStreamLayout = BufferLayout.struct([
 
@@ -86,10 +90,10 @@ export const TokenStreamLayout = BufferLayout.struct([
   BufferLayout.u8('nonce'),
   Layout.publicKey('tokenProgramId'),
   Layout.publicKey('tokenAccountA'),
-  Layout.publicKey('tokenAccountB'),
+  Layout.publicKey('tokenSwap'),
   Layout.publicKey('tokenPool'),
   Layout.publicKey('mintA'),
-  Layout.publicKey('mintB'),
+  Layout.publicKey('authority'),
   Layout.publicKey('feeAccount'),
 
 ]);
@@ -123,7 +127,7 @@ export class TokenSwap {
    * @param poolToken The pool token
    * @param authority The authority over the swap and accounts
    * @param tokenAccountA The token swap's Token A account
-   * @param tokenAccountB The token swap's Token B account
+  //  * @param tokenAccountB The token swap's Token B account
    * @param mintA The mint of Token A
    * @param payer Pays for the transaction
    */
@@ -137,9 +141,9 @@ export class TokenSwap {
     public feeAccount: PublicKey,
     public authority: PublicKey,
     public tokenAccountA: PublicKey,
-    public tokenAccountB: PublicKey,
+    // public tokenAccountB: PublicKey,
     public mintA: PublicKey,
-    public mintB: PublicKey,
+    // public mintB: PublicKey,
     public payer: Account,
   ) {
     this.connection = connection;
@@ -151,9 +155,9 @@ export class TokenSwap {
     this.feeAccount = feeAccount;
     this.authority = authority;
     this.tokenAccountA = tokenAccountA;
-    this.tokenAccountB = tokenAccountB;
+    // this.tokenAccountB = tokenAccountB;
     this.mintA = mintA;
-    this.mintB = mintB;
+    // this.mintB = mintB;
     this.payer = payer;
   }
 
@@ -174,7 +178,7 @@ export class TokenSwap {
     tokenSwapAccount: Account,
     authority: PublicKey,
     tokenAccountA: PublicKey,
-    tokenAccountB: PublicKey,
+    // tokenAccountB: PublicKey,
     tokenPool: PublicKey,
     feeAccount: PublicKey,
     tokenAccountPool: PublicKey,
@@ -239,9 +243,9 @@ export class TokenSwap {
     const poolToken = new PublicKey(tokenSwapData.tokenPool);
     const feeAccount = new PublicKey(tokenSwapData.feeAccount);
     const tokenAccountA = new PublicKey(tokenSwapData.tokenAccountA);
-    const tokenAccountB = new PublicKey(tokenSwapData.tokenAccountB);
+    // const tokenAccountB = new PublicKey(tokenSwapData.tokenAccountB);
     const mintA = new PublicKey(tokenSwapData.mintA);
-    const mintB = new PublicKey(tokenSwapData.mintB);
+    // const mintB = new PublicKey(tokenSwapData.mintB);
     const tokenProgramId = new PublicKey(tokenSwapData.tokenProgramId);
 
     return new TokenSwap(
@@ -254,9 +258,9 @@ export class TokenSwap {
       feeAccount,
       authority,
       tokenAccountA,
-      tokenAccountB,
+      // tokenAccountB,
       mintA,
-      mintB,
+      // mintB,
       payer,
     );
   }
@@ -285,10 +289,10 @@ export class TokenSwap {
     tokenSwapAccount: Account,
     authority: PublicKey,
     tokenAccountA: PublicKey,
-    tokenAccountB: PublicKey,
+    // tokenAccountB: PublicKey,
     poolToken: PublicKey,
     mintA: PublicKey,
-    mintB: PublicKey,
+    // mintB: PublicKey,
     feeAccount: PublicKey,
     tokenAccountPool: PublicKey,
     swapProgramId: PublicKey,
@@ -306,9 +310,9 @@ export class TokenSwap {
       feeAccount,
       authority,
       tokenAccountA,
-      tokenAccountB,
+      // tokenAccountB,
       mintA,
-      mintB,
+      // mintB,
       payer,
     );
 
@@ -331,7 +335,7 @@ export class TokenSwap {
       tokenSwapAccount,
       authority,
       tokenAccountA,
-      tokenAccountB,
+      // tokenAccountB,
       poolToken,
       feeAccount,
       tokenAccountPool,
