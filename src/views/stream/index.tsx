@@ -22,6 +22,7 @@ import {
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
   createTokenStreamAggrementUI,
+  createTokenStreamAggrement,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
@@ -56,7 +57,8 @@ export const StreamView = ({ setLoading }) => {
 
   const handleRequest = async () => {
     setLoading(true);
-    await createTokenStreamAggrementUI(publicKey, receiverAddr, flowRate, setLoading);
+    // await createTokenStreamAggrementUI(publicKey, receiverAddr, flowRate, setLoading);
+    await createTokenStreamAggrement();
   };
 
 
@@ -88,7 +90,7 @@ export const StreamView = ({ setLoading }) => {
             />
 
         <div style={{ margin: '24px 0' }} />
-            <Button onClick={handleRequest}>Deposit</Button>
+            <Button onClick={handleRequest}>Start Stream</Button>
           </div>
       </div>
     </div>

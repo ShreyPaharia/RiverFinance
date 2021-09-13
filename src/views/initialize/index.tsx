@@ -21,11 +21,11 @@ import {
   // createAccountAndSwapAtomic,
   createTokenStreamAggrement,
   createTokenSwap,
-  startStreaming,
+  // startStreaming,
   depositAllTokenTypes,
   withdrawAllTokenTypes,
-  depositSingleTokenTypeExactAmountIn,
-  withdrawSingleTokenTypeExactAmountOut,
+  // depositSingleTokenTypeExactAmountIn,
+  // withdrawSingleTokenTypeExactAmountOut,
 } from '../../spl/cli/tokenStreanFacade';
 
 

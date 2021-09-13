@@ -22,6 +22,7 @@ import {
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
   depositAllTokenTypesUI,
+  depositAllTokenTypes,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
@@ -56,7 +57,8 @@ export const DepositView = ({ setLoading }) => {
 
   const handleRequest = async () => {
     setLoading(true);
-    await depositAllTokenTypesUI(publicKey, amount, setLoading);
+    // await depositAllTokenTypesUI(publicKey, amount, setLoading);
+    await depositAllTokenTypes();
   };
 
 const streamMenus = (

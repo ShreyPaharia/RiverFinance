@@ -22,6 +22,7 @@ import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import { CurveType, Numberu64 } from '../../util/utils';
 import {
   withdrawAllTokenTypesUI,
+  withdrawAllTokenTypes,
 } from '../../spl/cli/tokenStreanFacade';
 import { DownOutlined, MoneyCollectOutlined , InboxOutlined } from '@ant-design/icons';
 
@@ -40,7 +41,9 @@ export const WithdrawView = ({ setLoading }) => {
 
   const handleRequest = async () => {
     setLoading(true);
-    await withdrawAllTokenTypesUI(publicKey, amount, setLoading);
+    // await withdrawAllTokenTypes();
+    // await withdrawAllTokenTypesUI(publicKey, amount, setLoading);
+    await withdrawAllTokenTypes();
   };
 
 const streamMenus = (

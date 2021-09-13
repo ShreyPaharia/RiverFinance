@@ -456,9 +456,9 @@ class TokenSwap {
      * @param sourceTokenAmount The amount of token A or B to deposit
      * @param minimumPoolTokenAmount Minimum amount of pool tokens to mint
      */
-    async depositSingleTokenTypeExactAmountIn(userAccount, poolAccount, userTransferAuthority, sourceTokenAmount, minimumPoolTokenAmount) {
-        return await (0, send_and_confirm_transaction_1.sendAndConfirmTransaction)('depositSingleTokenTypeExactAmountIn', this.connection, new web3_js_1.Transaction().add(TokenSwap.depositSingleTokenTypeExactAmountInInstruction(this.tokenSwap, this.authority, userTransferAuthority.publicKey, userAccount, this.tokenAccountA, this.tokenAccountB, this.poolToken, poolAccount, this.swapProgramId, this.tokenProgramId, sourceTokenAmount, minimumPoolTokenAmount)), this.payer, userTransferAuthority);
-    }
+    // async depositSingleTokenTypeExactAmountIn(userAccount, poolAccount, userTransferAuthority, sourceTokenAmount, minimumPoolTokenAmount) {
+    //     return await (0, send_and_confirm_transaction_1.sendAndConfirmTransaction)('depositSingleTokenTypeExactAmountIn', this.connection, new web3_js_1.Transaction().add(TokenSwap.depositSingleTokenTypeExactAmountInInstruction(this.tokenSwap, this.authority, userTransferAuthority.publicKey, userAccount, this.tokenAccountA, this.tokenAccountB, this.poolToken, poolAccount, this.swapProgramId, this.tokenProgramId, sourceTokenAmount, minimumPoolTokenAmount)), this.payer, userTransferAuthority);
+    // }
     static depositSingleTokenTypeExactAmountInInstruction(tokenSwap, authority, userTransferAuthority, source, intoA, intoB, poolToken, poolAccount, swapProgramId, tokenProgramId, sourceTokenAmount, minimumPoolTokenAmount) {
         const dataLayout = BufferLayout.struct([
             BufferLayout.u8('instruction'),

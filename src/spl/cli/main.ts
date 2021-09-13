@@ -2,11 +2,11 @@ import {
   // createAccountAndSwapAtomic,
   createTokenStreamAggrement,
   createTokenSwap,
-  startStreaming,
+  // startStreaming,
   depositAllTokenTypes,
   withdrawAllTokenTypes,
-  depositSingleTokenTypeExactAmountIn,
-  withdrawSingleTokenTypeExactAmountOut,
+  // depositSingleTokenTypeExactAmountIn,
+  // withdrawSingleTokenTypeExactAmountOut,
 } from './tokenStreanFacade';
 import {CurveType, Numberu64} from '../dist';
 

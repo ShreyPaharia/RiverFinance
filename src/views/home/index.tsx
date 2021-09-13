@@ -22,6 +22,7 @@ import {
 import {AccountLayout, Token, TOKEN_PROGRAM_ID} from '@solana/spl-token';
 import {
   createTokenSwapUI ,
+  createTokenSwap,
 } from '../../spl/cli/tokenStreanFacade';
 // import { createTokenStream } from "./createTokenStream"
 import { CurveType, Numberu64 } from '../../util/utils';
@@ -74,7 +75,8 @@ const streamMenus = (
 
   const handleRequest = async () => {
     setLoading(true);
-    await createTokenSwapUI (publicKey, setLoading);
+    // await createTokenSwapUI (publicKey, setLoading);
+    await createTokenSwap();
   };
 
 

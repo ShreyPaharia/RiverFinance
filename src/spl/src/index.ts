@@ -621,7 +621,7 @@ export class TokenSwap {
    */
   async depositAllTokenTypes(
     userAccountA: PublicKey,
-    userAccountB: PublicKey,
+    // userAccountB: PublicKey,
     poolAccount: PublicKey,
     userTransferAuthority: Account,
     poolTokenAmount: number | Numberu64,
@@ -637,9 +637,9 @@ export class TokenSwap {
           this.authority,
           userTransferAuthority.publicKey,
           userAccountA,
-          userAccountB,
+          // userAccountB,
           this.tokenAccountA,
-          this.tokenAccountB,
+          // this.tokenAccountB,
           this.poolToken,
           poolAccount,
           this.swapProgramId,
@@ -659,9 +659,9 @@ export class TokenSwap {
     authority: PublicKey,
     userTransferAuthority: PublicKey,
     sourceA: PublicKey,
-    sourceB: PublicKey,
+    // sourceB: PublicKey,
     intoA: PublicKey,
-    intoB: PublicKey,
+    // intoB: PublicKey,
     poolToken: PublicKey,
     poolAccount: PublicKey,
     swapProgramId: PublicKey,
@@ -720,7 +720,7 @@ export class TokenSwap {
    */
   async withdrawAllTokenTypes(
     userAccountA: PublicKey,
-    userAccountB: PublicKey,
+    // userAccountB: PublicKey,
     poolAccount: PublicKey,
     userTransferAuthority: Account,
     poolTokenAmount: number | Numberu64,
@@ -739,9 +739,9 @@ export class TokenSwap {
           this.feeAccount,
           poolAccount,
           this.tokenAccountA,
-          this.tokenAccountB,
+          // this.tokenAccountB,
           userAccountA,
-          userAccountB,
+          // userAccountB,
           this.swapProgramId,
           this.tokenProgramId,
           poolTokenAmount,
@@ -762,9 +762,9 @@ export class TokenSwap {
     feeAccount: PublicKey,
     sourcePoolAccount: PublicKey,
     fromA: PublicKey,
-    fromB: PublicKey,
+    // fromB: PublicKey,
     userAccountA: PublicKey,
-    userAccountB: PublicKey,
+    // userAccountB: PublicKey,
     swapProgramId: PublicKey,
     tokenProgramId: PublicKey,
     poolTokenAmount: number | Numberu64,
@@ -1181,7 +1181,7 @@ export class TokenSwap {
     tokenStreamAggrementA: PublicKey,
     tokenStreamAggrementB: PublicKey,
     userAccountA: PublicKey,
-    userAccountB: PublicKey,    
+    userAccountB: PublicKey,
     swapProgramId: PublicKey,
     tokenProgramId: PublicKey,
   ): TransactionInstruction {
@@ -1244,10 +1244,22 @@ export class TokenSwap {
    * @param feeDenominator Denominator of the fee ratio
    * @return Token object for the newly minted token, Public key of the account holding the total supply of new tokens
    */
+  // connection,
+  // streamPayer,
+  // tokenStreamAggrementAccount,
+  // tokenStreamAggrementA,
+  // tokenStreamAggrementB,
+  // userTransferAuthority,
+  // authority,
+  // userAccountA,
+  // userAccountB,
+  // TOKEN_SWAP_PROGRAM_ID,
+  // TOKEN_PROGRAM_ID,
+
   async createTokenStreamAggrement(
     connection: Connection,
-    payer: Account,
-    tokenStreamAggrementAccount: Account,
+    // payer: Account,
+    // tokenStreamAggrementAccount: Account,
     tokenStreamAggrementA: Account,
     tokenStreamAggrementB: Account,
     userTransferAuthority: Account,
@@ -1303,12 +1315,13 @@ export class TokenSwap {
 
     const instruction = TokenSwap.createInitStreamInstruction(
       this.tokenSwap,
-      this.authority,
+      authority,
+      // this.authority,
       userTransferAuthority.publicKey,
       tokenStreamAggrementA.publicKey,
       tokenStreamAggrementB.publicKey,
       userAccountA,
-      userAccountB,
+      this.tokenAccountA,
       this.swapProgramId,
       this.tokenProgramId,
     );
@@ -1320,7 +1333,6 @@ export class TokenSwap {
       connection,
       transaction,
       this.payer,
-      // this.tokenSw,
       tokenStreamAggrementA,
       tokenStreamAggrementB
     );
