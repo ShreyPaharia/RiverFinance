@@ -1,70 +1,22 @@
-# 🏗 Solana App Scaffold
-Scaffolding for a dapp built on Solana
+<p align="center"><img src="/RiverFinance.PNG" align="center" width="400"></p>
+ 
+<p  align="center">Platform for streaming tokens on Solana 🚀</p>
 
-# Quickstart
+## Motivation
 
-```bash
-git clone https://github.com/solana-labs/dapp-scaffold.git
+- A stream of payment can be easily used to pay for renting a service (NFT, DAO etc.) or for payment of salary by seconds rather than monthly. This enables real time payment of the service you provide without increased gas price.
+ 
+## Solution
+- Users can easily mint a River Token (Streamable Token) for any underlying token. This is handled using Initialize instruction.
+- Once initialized user can deposit underlying tokens and get River tokens in return. These tokens are directly deposited into a lending market to generate yield on deposited tokens. 
+- On starting a stream a new agreement is added to user accounts. These agreements are really flexible and different kinds of agreements can be implemented. This includes bilateral & pool based agreements. Flow rate can also be constant and follow a curve.
+ 
+## Future Work
+- Implement different types of agreements
+- Implement integrations with multiple lending markets to generate yield on deposit tokens.
+- Create SDKs to make it easy to create new river tokens and start streams.
+- Integration with other blockchains to handle deposit of their tokens but start stream on Solana.
 
-cd dapp-scaffold
-```
-
-```bash
-
-yarn
-
-```
-
-```bash
-
-yarn start
-
-```
-
-# Environment Setup
-1. Install Rust from https://rustup.rs/
-2. Install Solana v1.6.7 or later from https://docs.solana.com/cli/install-solana-cli-tools#use-solanas-install-tool
-3. Install Node
-4. Install NPM, Yarn
-
-# Build Smart Contract (compiled for BPF)
-Run the following from the program/ subdirectory:
-
-```bash
-$ cargo build-bpf
-$ cargo test-bpf
-```
-# Directory structure
-
-## program
-
-Solana program template in Rust
-
-### program/src/lib.rs
-* process_instruction function is used to run all calls issued to the smart contract
-
-## src/actions
-
-Setup here actions that will interact with Solana programs using sendTransaction function
-
-## src/contexts
-
-React context objects that are used propagate state of accounts across the application
-
-## src/hooks
-
-Generic react hooks to interact with token program:
-* useUserBalance - query for balance of any user token by mint, returns:
-    - balance
-    - balanceLamports
-    - balanceInUSD
-* useUserTotalBalance - aggregates user balance across all token accounts and returns value in USD
-    - balanceInUSD
-* useAccountByMint
-* useTokenName
-* useUserAccounts
-
-## src/views
-
-* home - main page for your app
-* faucet - airdrops SOL on Testnet and Devnet
+## Links
+- [Program Repository](https://github.com/ShreyPaharia/RiverFinanceProgram)
+- [Slides](https://drive.google.com/file/d/17VPc8cbmftIxU-LNYmyWwgHJc3FogacV/view)
